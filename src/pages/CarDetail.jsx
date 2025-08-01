@@ -1,0 +1,294 @@
+import React, { useState, useEffect } from "react"; // Tambahkan useEffect
+import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+
+// Import fungsi API yang baru kita buat
+import { fetchAvailableCars, createCarRentalOrder } from '../services/carRentalApi'; // Pastikan path ini benar
+
+function CarDetail() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  // Tidak perlu useParams untuk CarDetail jika halaman ini menampilkan daftar mobil.
+  // Jika setiap mobil punya halaman detail sendiri, baru useParams digunakan.
+  // Untuk saat ini, asumsikan ini adalah halaman untuk memilih mobil dari daftar.
+  const [selectedCarId, setSelectedCarId] = useState(null); // Ubah menjadi ID, bukan objek
+  const [selectedDates, setSelectedDates] = useState({
+    start: "",
+    end: "",
+  });
+  const [cars, setCars] = useState([]); // State untuk menyimpan data mobil dari API
+  const [isLoading, setIsLoading] = useState(true); // State untuk loading
+  const [error, setError] = useState(null); // State untuk error
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Untuk login check
+
+  // Cek status login saat komponen pertama kali dirender
+  useEffect(() => {
+    const token = localStorage.getItem("authToken"); // Menggunakan 'authToken'
+    setIsLoggedIn(!!token);
+  }, []);
+
+  // Effect untuk mengambil daftar mobil dari API
+  useEffect(() => {
+    const getCars = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await fetchAvailableCars();
+        setCars(data);
+        if (data.length > 0) {
+          setSelectedCarId(data[0].id); // Set default ke mobil pertama
+        }
+      } catch (err) {
+        console.error("Error fetching cars:", err);
+        setError("Failed to load available cars. Please try again.");
+        toast({
+          title: "Error",
+          description: err.response?.data?.message || "Failed to load car list.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getCars();
+  }, [toast]); // Re-run effect jika toast berubah (jarang, tapi aman)
+
+  // Temukan data mobil yang dipilih dari state `cars`
+  const carData = cars.find((car) => car.id === selectedCarId);
+
+  const calculateTotal = () => {
+    if (!carData) return 0; // Pastikan carData ada
+    if (!selectedDates.start || !selectedDates.end) return carData.price; // Harga per hari/periode default
+
+    const start = new Date(selectedDates.start);
+    const end = new Date(selectedDates.end);
+
+    // Validasi tanggal: end date tidak boleh sebelum start date
+    if (end < start) return 0; // Atau tampilkan error
+
+    const timeDiff = Math.abs(end.getTime() - start.getTime());
+    const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1; // +1 untuk menghitung hari awal & akhir
+    return carData.price * days; // Asumsi price adalah harga per hari
+  };
+
+  const handleRent = async () => { // Jadikan async
+    if (!isLoggedIn) {
+      toast({
+        title: "Login Required",
+        description: "Please login to rent a car",
+        variant: "destructive",
+      });
+      localStorage.setItem("redirectAfterLogin", "/car-detail"); // Sesuaikan redirect path
+      navigate("/login");
+      return;
+    }
+
+    if (!selectedDates.start || !selectedDates.end) {
+      toast({
+        title: "Please select dates",
+        description: "Choose your rental period",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const start = new Date(selectedDates.start);
+    const end = new Date(selectedDates.end);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (start < today || end < today || end < start) {
+        toast({
+            title: "Invalid Dates",
+            description: "Please select valid future dates for your rental.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+
+    if (!carData) {
+        toast({
+            title: "Error",
+            description: "No car selected or car data not found.",
+            variant: "destructive",
+        });
+        return;
+    }
+
+    const orderData = {
+      carId: carData.id,
+      startDate: selectedDates.start,
+      endDate: selectedDates.end,
+      // total: calculateTotal(), // Biarkan backend menghitung total untuk mencegah manipulasi
+    };
+
+    try {
+      // Panggil fungsi API untuk membuat pesanan sewa mobil
+      const response = await createCarRentalOrder(orderData);
+
+      // Setelah berhasil, simpan respons atau lakukan navigasi
+      localStorage.setItem("currentOrder", JSON.stringify(response)); // Simpan respons API jika diperlukan
+
+      toast({
+        title: "Car Reserved",
+        description: `Your ${carData.name} rental has been added to cart`,
+      });
+
+      navigate("/checkout"); // Navigasi ke halaman checkout
+    } catch (apiError) {
+      console.error("Error submitting car rental order:", apiError);
+      toast({
+        title: "Order Failed",
+        description: apiError.response?.data?.message || "Failed to reserve the car. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <p>Loading available cars...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <p className="text-red-500">{error}</p>
+        <Button onClick={() => navigate("/")}>Go to Home</Button>
+      </div>
+    );
+  }
+
+  // Jika tidak ada mobil yang ditemukan (misal dari API kosong)
+  if (!carData) {
+      return (
+          <div className="min-h-screen flex items-center justify-center pt-20">
+              <p>No cars available for rental.</p>
+          </div>
+      );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 pt-20">
+      {/* Hero Section */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative h-[40vh] overflow-hidden">
+        <img alt="Car rental service" className="w-full h-full object-cover" src="/api/placeholder/1200/600" />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-white">
+              <h1 className="text-5xl md:text-7xl font-bold mb-4">Car Rental</h1>
+              <p className="text-xl md:text-2xl">Select your preferred vehicle for your trip</p>
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Car Options */}
+            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3xl p-8 shadow-lg mb-8">
+              <h2 className="text-3xl font-bold mb-6 text-teal-800">Available Cars</h2>
+              <div className="space-y-4">
+                {cars.map((car) => ( // Render dari state `cars`
+                  <div key={car.id} className={`border rounded-xl p-4 cursor-pointer transition-all ${selectedCarId === car.id ? "border-teal-500 bg-teal-50" : "border-gray-200 hover:border-teal-300"}`} onClick={() => setSelectedCarId(car.id)}>
+                    <div className="flex items-center gap-4">
+                      <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedCarId === car.id ? "border-teal-500" : "border-gray-300"}`}>
+                        {selectedCarId === car.id && <div className="w-3 h-3 bg-teal-500 rounded-full"></div>}
+                      </div>
+
+                      <div className="flex flex-1 gap-4">
+                        <div className="w-36 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                          <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold text-teal-800">{car.name}</h3>
+                          <p className="text-lg font-medium">
+                            {car.duration} (${car.price})
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+
+            {/* What's Included */}
+            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
+              <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
+              <div className="grid grid-cols-1 gap-4">
+                {carData.includes.map((item, index) => ( // Menggunakan carData yang terpilih
+                  <div key={index} className="flex items-center gap-3">
+                    <span className="text-teal-500 text-xl">✓</span>
+                    <span className="text-gray-700 text-lg font-medium">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+          </div>
+
+          {/* Booking Section */}
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="lg:sticky lg:top-8 h-fit">
+            <div className="bg-white rounded-3xl p-8 shadow-lg">
+              <h2 className="text-3xl font-bold mb-2 text-teal-800">{carData.name}</h2>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl font-bold text-teal-800">${carData.price}</span>
+                <span className="text-gray-600 text-lg">({carData.duration})</span>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block font-bold mb-2 text-gray-700">Start Date</label>
+                  <input
+                    type="date"
+                    value={selectedDates.start}
+                    onChange={(e) => setSelectedDates((prev) => ({ ...prev, start: e.target.value }))}
+                    className="w-full border rounded-xl px-4 py-3 text-lg focus:ring-2 focus:ring-teal-500"
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold mb-2 text-gray-700">End Date</label>
+                  <input
+                    type="date"
+                    value={selectedDates.end}
+                    onChange={(e) => setSelectedDates((prev) => ({ ...prev, end: e.target.value }))}
+                    className="w-full border rounded-xl px-4 py-3 text-lg focus:ring-2 focus:ring-teal-500"
+                    min={selectedDates.start || new Date().toISOString().split("T")[0]} // End date cannot be before start date
+                  />
+                </div>
+
+                <div className="border-t pt-6">
+                  <div className="flex justify-between mb-4 text-lg">
+                    <span className="text-gray-700">Total</span>
+                    <span className="font-bold text-teal-800">${calculateTotal()}</span>
+                  </div>
+
+                  <Button size="lg" className="w-full text-lg bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white" onClick={handleRent}>
+                    Add to Cart
+                  </Button>
+                </div>
+
+                <p className="text-sm text-gray-500 text-center">Free cancellation up to 24 hours before pickup</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default CarDetail;
