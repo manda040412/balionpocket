@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from "react"; // Tambahkan useEffect
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Clock, Users, Plane, MapPin } from "lucide-react";
 
-// Import fungsi API yang baru kita buat
+// Import API function
 import { fetchAirportTransitDestinations, createAirportTransferOrder } from '../services/airportTransitApi';
 
 function AirportTransfer() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [selectedDestination, setSelectedDestination] = useState(""); // Default kosong, akan diisi dari API
-  const [destinations, setDestinations] = useState([]); // State untuk menyimpan data destinasi dari API
-  const [loading, setLoading] = useState(true); // State untuk loading
-  const [error, setError] = useState(null); // State untuk error
+  const [selectedDestination, setSelectedDestination] = useState("");
+  const [destinations, setDestinations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
     date: "",
@@ -25,7 +25,6 @@ function AirportTransfer() {
     dropoffAddress: "",
   });
 
-  // Effect untuk mengambil data destinasi saat komponen dimuat
   useEffect(() => {
     const getDestinations = async () => {
       try {
@@ -33,7 +32,7 @@ function AirportTransfer() {
         const data = await fetchAirportTransitDestinations();
         setDestinations(data);
         if (data.length > 0) {
-          setSelectedDestination(data[0].id); // Set default ke destinasi pertama
+          setSelectedDestination(data[0].id);
         }
       } catch (err) {
         setError("Failed to load destinations. Please try again later.");
@@ -49,7 +48,7 @@ function AirportTransfer() {
     };
 
     getDestinations();
-  }, []); // [] agar hanya berjalan sekali saat komponen mount
+  }, []);
 
   const destinationData = destinations.find((dest) => dest.id === selectedDestination) || destinations[0];
 
@@ -62,13 +61,12 @@ function AirportTransfer() {
   };
 
   const calculateTotal = () => {
-    // Pastikan destinationData ada sebelum mencoba mengakses .price
     if (!destinationData) return 0;
     const basePrice = destinationData.price;
     return basePrice * formData.passengers;
   };
 
-  const handleSubmit = async () => { // Jadikan async
+  const handleSubmit = async () => {
     if (!formData.date || !formData.time || !formData.dropoffAddress) {
       toast({
         title: "Missing Information",
@@ -79,7 +77,7 @@ function AirportTransfer() {
     }
 
     const orderData = {
-      destinationId: selectedDestination, // Kirim ID destinasi
+      destinationId: selectedDestination,
       type: "airport-transfer",
       date: formData.date,
       time: formData.time,
@@ -87,22 +85,21 @@ function AirportTransfer() {
       flightNumber: formData.flightNumber,
       pickupTerminal: formData.pickupTerminal,
       dropoffAddress: formData.dropoffAddress,
-      // Anda mungkin juga ingin mengirim total harga yang dihitung di frontend,
-      // tapi lebih aman jika total harga juga dihitung di backend untuk mencegah manipulasi.
-      // total: calculateTotal(),
+      // --- PERUBAHAN DI SINI ---
+      // Menambahkan field item_type dengan nilai 'airport_transfer'
+      item_type: "airport_transfer",
+      // --- AKHIR PERUBAHAN ---
     };
 
     try {
-      // Panggil fungsi API untuk membuat pesanan
       const response = await createAirportTransferOrder(orderData);
 
-      // Setelah berhasil, Anda bisa menyimpan respons atau melakukan navigasi
-      localStorage.setItem("currentOrder", JSON.stringify(response)); // Simpan respons API
+      localStorage.setItem("currentOrder", JSON.stringify(response));
       toast({
         title: "Transfer Reserved",
         description: `Your airport transfer to ${destinationData.name} has been added to cart`,
       });
-      navigate("/checkout"); // Navigasi ke halaman checkout
+      navigate("/checkout");
     } catch (apiError) {
       console.error("Error submitting airport transfer order:", apiError);
       toast({
@@ -129,15 +126,13 @@ function AirportTransfer() {
     );
   }
 
-  // Jika tidak ada destinasi yang ditemukan (misal dari API kosong)
   if (!destinationData) {
-      return (
-          <div className="min-h-screen flex items-center justify-center pt-20">
-              <p>No airport transfer destinations available.</p>
-          </div>
-      );
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <p>No airport transfer destinations available.</p>
+      </div>
+    );
   }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 pt-20">
@@ -239,7 +234,7 @@ function AirportTransfer() {
                     Passengers
                   </label>
                   <select name="passengers" value={formData.passengers} onChange={handleInputChange} className="w-full border rounded-xl px-4 py-3 text-lg focus:ring-2 focus:ring-teal-500">
-                    {[1, 2, 3, 4, 5].map((num) => ( // Max 5 passengers
+                    {[1, 2, 3, 4, 5].map((num) => (
                       <option key={num} value={num}>
                         {num} {num === 1 ? "Passenger" : "Passengers"}
                       </option>

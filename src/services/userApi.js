@@ -1,31 +1,52 @@
 import { api } from '../lib/apiClient';
 
+let errorFlags = {
+  profile: false,
+  updateProfile: false,
+  orders: false,
+};
+
 export async function fetchUserProfile() {
+  if (errorFlags.profile) return null;
   try {
-    const response = await api.get('/user/profile'); // Endpoint untuk mendapatkan profil user
+    const response = await api.get('/user/profile');
     return response.data;
   } catch (error) {
+    errorFlags.profile = true;
     console.error('Error fetching user profile:', error);
-    throw error;
+    return null;
   }
 }
 
 export async function updateUserProfile(profileData) {
+  if (errorFlags.updateProfile) return null;
   try {
-    const response = await api.put('/user/profile', profileData); // Endpoint untuk update profil
+    const response = await api.put('/user/profile', profileData);
     return response.data;
   } catch (error) {
+    errorFlags.updateProfile = true;
     console.error('Error updating user profile:', error);
-    throw error;
+    return null;
   }
 }
 
 export async function fetchUserOrders() {
+  if (errorFlags.orders) return null;
   try {
-    const response = await api.get('/user/orders'); // Endpoint untuk riwayat pesanan
+    const response = await api.get('/user/orders');
     return response.data;
   } catch (error) {
+    errorFlags.orders = true;
     console.error('Error fetching user orders:', error);
-    throw error;
+    return null;
   }
+}
+
+// Untuk reset error flags
+export function resetUserApiErrorFlags() {
+  errorFlags = {
+    profile: false,
+    updateProfile: false,
+    orders: false,
+  };
 }

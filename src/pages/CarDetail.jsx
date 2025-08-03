@@ -1,35 +1,30 @@
-import React, { useState, useEffect } from "react"; // Tambahkan useEffect
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 // Import fungsi API yang baru kita buat
-import { fetchAvailableCars, createCarRentalOrder } from '../services/carRentalApi'; // Pastikan path ini benar
+import { fetchAvailableCars, createCarRentalOrder } from '../services/carRentalApi';
 
 function CarDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  // Tidak perlu useParams untuk CarDetail jika halaman ini menampilkan daftar mobil.
-  // Jika setiap mobil punya halaman detail sendiri, baru useParams digunakan.
-  // Untuk saat ini, asumsikan ini adalah halaman untuk memilih mobil dari daftar.
-  const [selectedCarId, setSelectedCarId] = useState(null); // Ubah menjadi ID, bukan objek
+  const [selectedCarId, setSelectedCarId] = useState(null);
   const [selectedDates, setSelectedDates] = useState({
     start: "",
     end: "",
   });
-  const [cars, setCars] = useState([]); // State untuk menyimpan data mobil dari API
-  const [isLoading, setIsLoading] = useState(true); // State untuk loading
-  const [error, setError] = useState(null); // State untuk error
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Untuk login check
+  const [cars, setCars] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Cek status login saat komponen pertama kali dirender
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); // Menggunakan 'authToken'
+    const token = localStorage.getItem("authToken");
     setIsLoggedIn(!!token);
   }, []);
 
-  // Effect untuk mengambil daftar mobil dari API
   useEffect(() => {
     const getCars = async () => {
       setIsLoading(true);
@@ -38,7 +33,7 @@ function CarDetail() {
         const data = await fetchAvailableCars();
         setCars(data);
         if (data.length > 0) {
-          setSelectedCarId(data[0].id); // Set default ke mobil pertama
+          setSelectedCarId(data[0].id);
         }
       } catch (err) {
         console.error("Error fetching cars:", err);
@@ -54,34 +49,32 @@ function CarDetail() {
     };
 
     getCars();
-  }, [toast]); // Re-run effect jika toast berubah (jarang, tapi aman)
+  }, [toast]);
 
-  // Temukan data mobil yang dipilih dari state `cars`
   const carData = cars.find((car) => car.id === selectedCarId);
 
   const calculateTotal = () => {
-    if (!carData) return 0; // Pastikan carData ada
-    if (!selectedDates.start || !selectedDates.end) return carData.price; // Harga per hari/periode default
+    if (!carData) return 0;
+    if (!selectedDates.start || !selectedDates.end) return carData.price;
 
     const start = new Date(selectedDates.start);
     const end = new Date(selectedDates.end);
 
-    // Validasi tanggal: end date tidak boleh sebelum start date
-    if (end < start) return 0; // Atau tampilkan error
+    if (end < start) return 0;
 
     const timeDiff = Math.abs(end.getTime() - start.getTime());
-    const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1; // +1 untuk menghitung hari awal & akhir
-    return carData.price * days; // Asumsi price adalah harga per hari
+    const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+    return carData.price * days;
   };
 
-  const handleRent = async () => { // Jadikan async
+  const handleRent = async () => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
         description: "Please login to rent a car",
         variant: "destructive",
       });
-      localStorage.setItem("redirectAfterLogin", "/car-detail"); // Sesuaikan redirect path
+      localStorage.setItem("redirectAfterLogin", "/car-detail");
       navigate("/login");
       return;
     }
@@ -101,44 +94,43 @@ function CarDetail() {
     today.setHours(0, 0, 0, 0);
 
     if (start < today || end < today || end < start) {
-        toast({
-            title: "Invalid Dates",
-            description: "Please select valid future dates for your rental.",
-            variant: "destructive",
-        });
-        return;
+      toast({
+        title: "Invalid Dates",
+        description: "Please select valid future dates for your rental.",
+        variant: "destructive",
+      });
+      return;
     }
 
-
     if (!carData) {
-        toast({
-            title: "Error",
-            description: "No car selected or car data not found.",
-            variant: "destructive",
-        });
-        return;
+      toast({
+        title: "Error",
+        description: "No car selected or car data not found.",
+        variant: "destructive",
+      });
+      return;
     }
 
     const orderData = {
       carId: carData.id,
       startDate: selectedDates.start,
       endDate: selectedDates.end,
-      // total: calculateTotal(), // Biarkan backend menghitung total untuk mencegah manipulasi
+      // --- START PERUBAHAN DI SINI ---
+      item_type: "car_rental", // Menambahkan field item_type
+      // --- END PERUBAHAN DI SINI ---
     };
 
     try {
-      // Panggil fungsi API untuk membuat pesanan sewa mobil
       const response = await createCarRentalOrder(orderData);
 
-      // Setelah berhasil, simpan respons atau lakukan navigasi
-      localStorage.setItem("currentOrder", JSON.stringify(response)); // Simpan respons API jika diperlukan
+      localStorage.setItem("currentOrder", JSON.stringify(response));
 
       toast({
         title: "Car Reserved",
         description: `Your ${carData.name} rental has been added to cart`,
       });
 
-      navigate("/checkout"); // Navigasi ke halaman checkout
+      navigate("/checkout");
     } catch (apiError) {
       console.error("Error submitting car rental order:", apiError);
       toast({
@@ -166,13 +158,12 @@ function CarDetail() {
     );
   }
 
-  // Jika tidak ada mobil yang ditemukan (misal dari API kosong)
   if (!carData) {
-      return (
-          <div className="min-h-screen flex items-center justify-center pt-20">
-              <p>No cars available for rental.</p>
-          </div>
-      );
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-20">
+        <p>No cars available for rental.</p>
+      </div>
+    );
   }
 
   return (
@@ -199,7 +190,7 @@ function CarDetail() {
             <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3xl p-8 shadow-lg mb-8">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">Available Cars</h2>
               <div className="space-y-4">
-                {cars.map((car) => ( // Render dari state `cars`
+                {cars.map((car) => (
                   <div key={car.id} className={`border rounded-xl p-4 cursor-pointer transition-all ${selectedCarId === car.id ? "border-teal-500 bg-teal-50" : "border-gray-200 hover:border-teal-300"}`} onClick={() => setSelectedCarId(car.id)}>
                     <div className="flex items-center gap-4">
                       <div className={`w-6 h-6 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${selectedCarId === car.id ? "border-teal-500" : "border-gray-300"}`}>
@@ -228,7 +219,7 @@ function CarDetail() {
             <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
               <div className="grid grid-cols-1 gap-4">
-                {carData.includes.map((item, index) => ( // Menggunakan carData yang terpilih
+                {carData.includes.map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <span className="text-teal-500 text-xl">✓</span>
                     <span className="text-gray-700 text-lg font-medium">{item}</span>
@@ -266,7 +257,7 @@ function CarDetail() {
                     value={selectedDates.end}
                     onChange={(e) => setSelectedDates((prev) => ({ ...prev, end: e.target.value }))}
                     className="w-full border rounded-xl px-4 py-3 text-lg focus:ring-2 focus:ring-teal-500"
-                    min={selectedDates.start || new Date().toISOString().split("T")[0]} // End date cannot be before start date
+                    min={selectedDates.start || new Date().toISOString().split("T")[0]}
                   />
                 </div>
 

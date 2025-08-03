@@ -4,18 +4,17 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-// Import fungsi API yang baru kita buat
 import { fetchTourPackageById, addTourPackageToCart } from '../services/tourPackageApi'; // Pastikan path ini benar
 
 function PackageDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [quantity, setQuantity] = useState(2); // Default ke 2 karena minimum 2 pax
+  const [quantity, setQuantity] = useState(2);
   const [selectedDate, setSelectedDate] = useState("");
   const [packageData, setPackageData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null); // State untuk menangani error API
+  const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Cek status login saat komponen pertama kali dirender
@@ -33,10 +32,15 @@ function PackageDetail() {
 
       try {
         const data = await fetchTourPackageById(id);
-        setPackageData(data);
+        const transformedData = { ...data };
+        if (transformedData.features && Array.isArray(transformedData.features) && transformedData.features.length > 0) {
+          transformedData.longDescription = `${transformedData.longDescription}. What's Included: ${transformedData.features.join(', ')}.`;
+          // transformedData.features = undefined; // Opsional: hapus jika tidak lagi diperlukan
+        }
+        setPackageData(transformedData);
       } catch (err) {
         console.error("Error fetching package detail:", err);
-        setError("Failed to load package details. Please try again."); // Pesan error yang user-friendly
+        setError("Failed to load package details. Please try again.");
         toast({
           title: "Error",
           description: err.response?.data?.message || "Failed to load package details.",
@@ -47,19 +51,18 @@ function PackageDetail() {
       }
     };
 
-    if (id) { // Pastikan ID ada sebelum memanggil API
+    if (id) {
       getPackageDetail();
     }
-  }, [id, toast]); // Re-run effect jika ID berubah
+  }, [id, toast]);
 
-  const handleOrder = async () => { // Jadikan fungsi async
+  const handleOrder = async () => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
         description: "Please login to continue with your booking",
         variant: "destructive",
       });
-      // Simpan URL saat ini untuk redirect setelah login
       localStorage.setItem("redirectAfterLogin", `/packages/${id}`);
       navigate("/login");
       return;
@@ -86,7 +89,7 @@ function PackageDetail() {
       return;
     }
 
-    if (quantity < 2) { // Asumsi minimum 2 guests ini adalah validasi frontend dan backend
+    if (quantity < 2) {
       toast({
         title: "Minimum guests required",
         description: "This package requires at least 2 guests",
@@ -95,19 +98,24 @@ function PackageDetail() {
       return;
     }
 
-    if (!packageData) return; // Seharusnya tidak terjadi jika loading sudah selesai
+    if (!packageData) return;
 
     try {
+      // --- START PERUBAHAN DI SINI ---
+      const itemToAdd = {
+        packageId: packageData.id,
+        quantity: quantity,
+        selectedDate: selectedDate,
+        // Menambahkan field item_type
+        item_type: "tour_package",
+      };
+
       // Panggil fungsi API untuk menambahkan item ke keranjang
-      const response = await addTourPackageToCart(packageData.id, quantity, selectedDate);
+      // Sesuaikan `addTourPackageToCart` agar menerima objek itemToAdd
+      const response = await addTourPackageToCart(itemToAdd);
+      // --- END PERUBAHAN DI SINI ---
 
-      // Backend harus mengembalikan struktur yang sesuai untuk keranjang
-      // Anda mungkin perlu menyesuaikan bagaimana data disimpan di localStorage("cart")
-      // atau biarkan backend yang mengelola keranjang secara penuh.
-      // Untuk sementara, saya akan menghapus logika localStorage.setItem("cart") dan hanya mengarahkan.
-
-      // Jika backend Anda mengembalikan item keranjang yang diperbarui atau konfirmasi, gunakan itu
-      localStorage.setItem("currentOrder", JSON.stringify(response)); // Simpan respons dari API jika diperlukan
+      localStorage.setItem("currentOrder", JSON.stringify(response));
 
       toast({
         title: "Successfully Added to Cart",
@@ -144,7 +152,7 @@ function PackageDetail() {
     );
   }
 
-  if (!packageData) { // Jika tidak ada data paket (misalnya ID tidak valid atau API mengembalikan null)
+  if (!packageData) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 flex justify-center items-center">
         <div className="text-center">
@@ -188,18 +196,6 @@ function PackageDetail() {
             <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-3xl p-8 shadow-lg mb-8">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">About This Tour</h2>
               <p className="text-gray-700 mb-6">{packageData.longDescription}</p>
-            </motion.section>
-
-            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-3xl p-8 shadow-lg">
-              <h2 className="text-2xl md:text-3xl font-bold mb-6">What's Included</h2>
-              <div className="space-y-4">
-                {packageData.features.map((feature, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <span className="text-emerald-500 text-xl">✓</span>
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
             </motion.section>
           </div>
 

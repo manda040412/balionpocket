@@ -16,31 +16,25 @@ function Packages() {
   const [isLoading, setIsLoading] = useState(true)
   const [packageList, setPackageList] = useState(null);
   const [error, setError] = useState(null); // State untuk menangani error API
-  
+
   useEffect(() => {
     const fetchTourPackage = async () => {
-      if(!packageList) {
+      if (!packageList) {
         await fetchTourPackageData();
       }
     }
-    
+
     fetchTourPackage();
   }, [])
 
+  // --- START PERUBAHAN DI SINI UNTUK allPackages ---
   const allPackages = [
     {
       id: 1,
       title: "MOUNT BATUR SUNRISE VIEW",
       price: 110,
-      description: "Experience breathtaking sunrise views from an active volcano",
-      features: [
-        "MIN 2 PAX",
-        "PANCAKE BREAKFAST",
-        "SUNRISE JEEP TOUR",
-        "BLACK LAVA",
-        "HOT SPRING",
-        "GUIDE & PHOTOGRAPHER"
-      ],
+      description: "Experience breathtaking sunrise views from an active volcano. Includes: MIN 2 PAX, PANCAKE BREAKFAST, SUNRISE JEEP TOUR, BLACK LAVA, HOT SPRING, GUIDE & PHOTOGRAPHER.",
+      // features array removed
       category: "adventure",
       image: "https://images.unsplash.com/photo-1604608672516-f1b9990afa14"
     },
@@ -48,17 +42,8 @@ function Packages() {
       id: 2,
       title: "BALI CULTURE TRIP",
       price: 90,
-      description: "Immerse yourself in Balinese culture and traditions",
-      features: [
-        "MIN 2 PAX",
-        "BATUAN TEMPLE",
-        "MONKEY FOREST",
-        "JUNGLE SWING",
-        "RICE TERRACE",
-        "GOA GAJAH TEMPLE",
-        "COFFEE PLANTATION",
-        "INCLUDE ENTRANCE FEE" // Added "INCLUDE ENTRANCE FEE"
-      ],
+      description: "Immerse yourself in Balinese culture and traditions. Includes: MIN 2 PAX, BATUAN TEMPLE, MONKEY FOREST, JUNGLE SWING, RICE TERRACE, GOA GAJAH TEMPLE, COFFEE PLANTATION, INCLUDE ENTRANCE FEE.",
+      // features array removed
       category: "cultural",
       image: "https://images.unsplash.com/photo-1542897644-e04428948020"
     },
@@ -66,16 +51,8 @@ function Packages() {
       id: 3,
       title: "GATE OF HEAVEN TRIP",
       price: 95,
-      description: "Visit Bali's most iconic and spiritual locations",
-      features: [
-        "MIN 2 PAX",
-        "LEMPUYANG TEMPLE",
-        "TIRTA GANGGA",
-        "COFFEE BREAK",
-        "BALINESE SWING",
-        "GOA RAJA WATERFALL",
-        "INCLUDE ENTRANCE FEE" // Added "INCLUDE ENTRANCE FEE"
-      ],
+      description: "Visit Bali's most iconic and spiritual locations. Includes: MIN 2 PAX, LEMPUYANG TEMPLE, TIRTA GANGGA, COFFEE BREAK, BALINESE SWING, GOA RAJA WATERFALL, INCLUDE ENTRANCE FEE.",
+      // features array removed
       category: "cultural",
       image: "https://images.unsplash.com/photo-1621184455862-c163dfb30e0f"
     },
@@ -83,17 +60,8 @@ function Packages() {
       id: 4,
       title: "UBUD TRIP",
       price: 75,
-      description: "Discover the cultural heart of Bali in Ubud",
-      features: [
-        "MIN 2 PAX",
-        "BATIK FACTORY",
-        "SILVER FACTORY",
-        "BATUAN TEMPLE",
-        "RICE TERRACE",
-        "BALI SWING",
-        "MONKEY FOREST",
-        "INCLUDE ENTRANCE FEE" // Added "INCLUDE ENTRANCE FEE"
-      ],
+      description: "Discover the cultural heart of Bali in Ubud. Includes: MIN 2 PAX, BATIK FACTORY, SILVER FACTORY, BATUAN TEMPLE, RICE TERRACE, BALI SWING, MONKEY FOREST, INCLUDE ENTRANCE FEE.",
+      // features array removed
       category: "cultural",
       image: "https://images.unsplash.com/photo-1555400038-63f5ba517a47"
     },
@@ -101,20 +69,13 @@ function Packages() {
       id: 5,
       title: "JUNGLE ADVENTURE",
       price: 125,
-      description: "Thrilling adventures through Bali's incredible jungles",
-      features: [
-        "MIN 2 PAX",
-        "ATV JUNGLE",
-        "BALI ZOO",
-        "RICE TERRACE",
-        "COFFEE PLANTATION",
-        "MONKEY FOREST",
-        "WATERFALL"
-      ],
+      description: "Thrilling adventures through Bali's incredible jungles. Includes: MIN 2 PAX, ATV JUNGLE, BALI ZOO, RICE TERRACE, COFFEE PLANTATION, MONKEY FOREST, WATERFALL.",
+      // features array removed
       category: "adventure",
       image: "https://images.unsplash.com/photo-1512100356356-de1b84283e18"
     }
   ]
+  // --- END PERUBAHAN DI SINI UNTUK allPackages ---
 
   // Effect untuk mengambil data paket tour dari API
   useEffect(() => {
@@ -124,7 +85,18 @@ function Packages() {
 
       try {
         const data = await fetchTourPackages();
-        setPackages(data);
+        const transformedData = data.map(pkg => {
+          if (pkg.features && Array.isArray(pkg.features) && pkg.features.length > 0) {
+            return {
+              ...pkg,
+              description: `${pkg.description}. Includes: ${pkg.features.join(', ')}.`,
+              features: undefined,
+            };
+          }
+          return pkg;
+        });
+        setPackages(transformedData);
+
       } catch (err) {
         console.error("Error fetching tour packages:", err);
         setError("Failed to load tour packages. Please try again."); // Pesan error yang user-friendly
@@ -133,7 +105,7 @@ function Packages() {
           description: err.response?.data?.message || "Failed to load tour packages.",
           variant: "destructive",
         });
-        setPackages([]); // Kosongkan jika ada error
+        setPackages(allPackages); // Fallback ke data lokal yang sudah digabungkan jika ada error API
       } finally {
         setIsLoading(false);
       }
@@ -227,9 +199,9 @@ function Packages() {
               >
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 h-64 md:h-auto relative">
-                    <img 
-                      alt={pkg.title} 
-                      className="w-full h-full object-cover" 
+                    <img
+                      alt={pkg.title}
+                      className="w-full h-full object-cover"
                       src={pkg.image || "https://via.placeholder.com/400x300"}
                     /> {/* Tambahkan fallback image */}
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2">
@@ -238,16 +210,22 @@ function Packages() {
                   </div>
                   <div className="md:w-2/3 p-6 md:p-8">
                     <h3 className="text-2xl font-bold mb-2">{pkg.title}</h3>
+                    {/* Menggunakan description yang sudah digabungkan */}
                     <p className="text-gray-600 mb-6">{pkg.description}</p>
 
+                    {/* --- START PERUBAHAN DI SINI UNTUK MENGHAPUS FITUR --- */}
+                    {/* Bagian ini dihapus karena fitur sudah digabung ke dalam deskripsi */}
+                    {/*
                     <div className="space-y-2">
-                      {pkg.features && pkg.features.map((feature, idx) => ( // Pastikan pkg.features ada
+                      {pkg.features && pkg.features.map((feature, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <span className="text-teal-600 mt-1">•</span>
                           <span>{feature}</span>
                         </div>
                       ))}
                     </div>
+                    */}
+                    {/* --- END PERUBAHAN DI SINI UNTUK MENGHAPUS FITUR --- */}
 
                     <Button
                       className="mt-6 bg-black hover:bg-gray-800"
