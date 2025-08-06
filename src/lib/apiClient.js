@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from "./constants";
+import { useNavigate } from 'react-router-dom';
 
 const apiClient = axios.create({
     baseURL: `${config.baseUrl}/api`,
@@ -11,6 +12,8 @@ apiClient.interceptors.request.use((config) => {
     
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+    } else {
+        console.log("Unauthenticated, please try login");
     }
     return config;
 });

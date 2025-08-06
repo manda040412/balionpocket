@@ -34,7 +34,7 @@ export async function fetchTourPackageById(id) {
 export async function addTourPackageToCart(itemData) {
   if (errorFlags.addToCart) return null;
   try {
-    const response = await api.post('/cart/add-tour-package', itemData); // Mengirim seluruh objek itemData
+    const response = await api.post('/cart/tour-package', itemData); // Mengirim seluruh objek itemData
     return response.data;
   } catch (error) {
     errorFlags.addToCart = true;

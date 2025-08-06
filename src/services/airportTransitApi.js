@@ -11,7 +11,7 @@ let errorFlags = {
 export async function fetchAirportTransitDestinations() {
   if (errorFlags.destinations) return null;
   try {
-    const response = await api.get('/airport-transits/destinations');
+    const response = await api.get('/airport-transits');
     return response.data;
   } catch (error) {
     errorFlags.destinations = true;
@@ -23,7 +23,7 @@ export async function fetchAirportTransitDestinations() {
 export async function fetchAirportTransitDestinationById(id) {
   if (errorFlags.destinationById[id]) return null;
   try {
-    const response = await api.get(`/airport-transits/destinations/${id}`);
+    const response = await api.get(`/airport-transits/${id}`);
     return response.data;
   } catch (error) {
     errorFlags.destinationById[id] = true;
@@ -35,7 +35,7 @@ export async function fetchAirportTransitDestinationById(id) {
 export async function createAirportTransitBooking(data) {
   if (errorFlags.createBooking) return null;
   try {
-    const response = await api.post('/airport-transits/bookings', data);
+    const response = await api.post('/cart/airport-transit', data);
     return response.data;
   } catch (error) {
     errorFlags.createBooking = true;

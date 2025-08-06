@@ -8,7 +8,7 @@ let errorFlags = {
 export async function fetchAvailableCars() {
   if (errorFlags.availableCars) return null;
   try {
-    const response = await api.get('/car-rentals/available');
+    const response = await api.get('/car-rentals');
     return response.data;
   } catch (error) {
     errorFlags.availableCars = true;
@@ -20,7 +20,7 @@ export async function fetchAvailableCars() {
 export async function createCarRentalOrder(orderData) {
   if (errorFlags.createOrder) return null;
   try {
-    const response = await api.post('/car-rentals/order', orderData);
+    const response = await api.post('/cart/car-rental', orderData);
     return response.data;
   } catch (error) {
     errorFlags.createOrder = true;

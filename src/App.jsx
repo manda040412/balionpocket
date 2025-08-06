@@ -13,9 +13,10 @@ import { Toaster } from "./components/ui/toaster"
 import Profile from "./pages/Profile"
 import CompanyProfile from './pages/CompanyProfile'
 import Cart from './pages/Cart'
-
+import Callback from "./pages/api/auth/callback"
 
 function App() {
+  console.log("coba");
   return (
     <Router>
       <div className="min-h-screen bg-background">
@@ -31,6 +32,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/company-profile" element={<CompanyProfile />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/api/auth/callback" element={<Callback />} />
         </Routes>
         <Footer />
         <Toaster />

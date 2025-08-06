@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
-import { fetchTourPackageData } from "../lib/data/frontend.data"
 import { useToast } from "@/components/ui/use-toast"; // Import useToast untuk penanganan error
 
 // Import API function
@@ -16,17 +15,7 @@ function Packages() {
   const [isLoading, setIsLoading] = useState(true)
   const [packageList, setPackageList] = useState(null);
   const [error, setError] = useState(null); // State untuk menangani error API
-
-  useEffect(() => {
-    const fetchTourPackage = async () => {
-      if (!packageList) {
-        await fetchTourPackageData();
-      }
-    }
-
-    fetchTourPackage();
-  }, [])
-
+  
   // --- START PERUBAHAN DI SINI UNTUK allPackages ---
   const allPackages = [
     {
@@ -85,7 +74,7 @@ function Packages() {
 
       try {
         const data = await fetchTourPackages();
-        const transformedData = data.map(pkg => {
+        const transformedData = data?.length > 0 ? data?.map(pkg => {
           if (pkg.features && Array.isArray(pkg.features) && pkg.features.length > 0) {
             return {
               ...pkg,
@@ -94,7 +83,7 @@ function Packages() {
             };
           }
           return pkg;
-        });
+        }) : [];
         setPackages(transformedData);
 
       } catch (err) {
@@ -112,7 +101,7 @@ function Packages() {
     };
 
     getPackages();
-  }, [toast]); // Re-run effect jika toast berubah (jarang, tapi aman)
+  }, []); // Re-run effect jika toast berubah (jarang, tapi aman)
 
   const filteredPackages = filter === "all"
     ? packages

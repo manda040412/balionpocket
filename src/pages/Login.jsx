@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-// import { config } from "../lib/constants"; // Hapus ini, tidak diperlukan lagi
 
 // Import API functions
 import { loginUser, registerUser } from '../services/authApi';
+import { config } from "../lib/constants";
+import { isLogin } from "../lib/utils";
 
 function Login() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ function Login() {
   // `baseUrl` dari config.js tidak lagi diperlukan karena apiClient mengelolanya.
   // Jika Anda memiliki URL otentikasi pihak ketiga (seperti Google OAuth) yang tidak melalui apiClient,
   // Anda bisa mendapatkannya dari environment variable (misal: process.env.NEXT_PUBLIC_GOOGLE_AUTH_URL).
-  const googleAuthUrl = process.env.NEXT_PUBLIC_BACKEND_URL ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google` : 'http://localhost:8080/auth/google'; // Contoh: ganti dengan URL Google OAuth backend Anda
+  const googleAuthUrl = config.baseUrl ? `${config.baseUrl}/login/google` : 'http://localhost:8000/login/google'; // Contoh: ganti dengan URL Google OAuth backend Anda
 
   useEffect(() => {
     const storedRedirectPath = localStorage.getItem("redirectAfterLogin");

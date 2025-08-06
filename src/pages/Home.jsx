@@ -99,9 +99,9 @@ function Home() {
         ]);
 
         // Ambil hanya 3-4 item pertama jika ingin menampilkan "featured" saja
-        setTourPackages(tourRes.slice(0, 3)); // Ambil 3 paket tur pertama
-        setAirportTransfers(airportRes.slice(0, 3)); // Ambil 3 transfer pertama
-        setCarRentals(carRes.slice(0, 2)); // Ambil 2 mobil pertama
+        setTourPackages(tourRes?.length > 0 ? tourRes.slice(0, 3) : []); // Ambil 3 paket tur pertama
+        setAirportTransfers(airportRes?.length > 0 ? airportRes.slice(0, 3) : []); // Ambil 3 transfer pertama
+        setCarRentals(carRes?.length > 0 ? carRes.slice(0, 2) : []); // Ambil 2 mobil pertama
 
       } catch (err) {
         console.error("Error fetching data for home page:", err);
@@ -117,7 +117,7 @@ function Home() {
     };
 
     fetchData();
-  }, [toast]);
+  }, []);
 
   if (isLoading) {
     return (
