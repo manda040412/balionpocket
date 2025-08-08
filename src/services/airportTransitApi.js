@@ -9,14 +9,14 @@ let errorFlags = {
 };
 
 export async function fetchAirportTransitDestinations() {
-  if (errorFlags.destinations) return null;
+  if (errorFlags.destinations) return [];
   try {
     const response = await api.get('/airport-transits');
     return response.data;
   } catch (error) {
     errorFlags.destinations = true;
     console.error('Error fetching airport transit destinations:', error);
-    return null;
+    return [];
   }
 }
 
@@ -78,7 +78,6 @@ export async function createAirportTransferOrder(orderData) {
   }
 }
 
-// ...existing code...
 export function resetAirportTransitApiErrorFlags() {
   errorFlags = {
     destinations: false,

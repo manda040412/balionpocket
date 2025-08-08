@@ -2,8 +2,10 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs) {
-	return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
-export const isLogin = (localStorage.getItem('authToken')) ? true : false;
-
+// Ubah isLogin menjadi fungsi
+export const isLogin = () => {
+  return localStorage.getItem('authToken') ? true : false;
+};

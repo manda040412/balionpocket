@@ -2,19 +2,18 @@ import { AxiosRequestConfig } from "axios";
 import apiClient from "./apiClient"
 
 interface PostDataConfig {
-    config: AxiosRequestConfig; // Axios configuration
+    config: AxiosRequestConfig;
 }
 
 interface PostDataArgs {
     data: {
-        url: string; // URL endpoint
-        payload?: Record<string, any>; // Data to send in the request
-    }; // Data object containing URL and payload
-    config?: AxiosRequestConfig; // Axios request configuration
-    params?: Record<string, any>; // Optional additional parameters
+        url: string;
+        payload?: Record<string, any>;
+    };
+    config?: AxiosRequestConfig;
+    params?: Record<string, any>;
 }
 
-// Define the type for the state structure
 interface State {
     status: number;
     data: any;

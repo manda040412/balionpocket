@@ -322,7 +322,7 @@ function Login() {
 
                   <div className="mt-6 grid grid-cols-1 gap-3">
                     <a
-                      href={googleAuthUrl} // Menggunakan URL Google OAuth dari env
+                      href={googleAuthUrl}
                       type="button"
                       className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white py-2 px-4 border border-white/20 rounded-xl shadow-sm text-sm font-medium transition-colors"
                     >
