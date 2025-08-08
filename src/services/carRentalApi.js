@@ -9,7 +9,7 @@ export async function fetchAvailableCars() {
   if (errorFlags.availableCars) return null;
   try {
     const response = await api.get('/car-rentals');
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.availableCars = true;
     console.error('Error fetching available cars:', error);
@@ -21,7 +21,7 @@ export async function createCarRentalOrder(orderData) {
   if (errorFlags.createOrder) return null;
   try {
     const response = await api.post('/cart/car-rental', orderData);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.createOrder = true;
     console.error('Error creating car rental order:', error);

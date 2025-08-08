@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react"; // Tambahkan useStat
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import DOMPurify from 'dompurify';
 import { useToast } from "@/components/ui/use-toast"; // Tambahkan useToast untuk penanganan error
 
 // Import API functions
@@ -19,6 +20,8 @@ function Home() {
   const [carRentals, setCarRentals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const safe = html => ({ __html: DOMPurify.sanitize(html) });
 
   const totalTestimonials = 4; // Tetap statis untuk saat ini
 
@@ -97,6 +100,8 @@ function Home() {
           fetchAirportTransitDestinations(),
           fetchAvailableCars()
         ]);
+
+        console.log(tourRes)
 
         // Ambil hanya 3-4 item pertama jika ingin menampilkan "featured" saja
         setTourPackages(tourRes?.length > 0 ? tourRes.slice(0, 3) : []); // Ambil 3 paket tur pertama
@@ -205,12 +210,12 @@ function Home() {
                 transition={{ delay: index * 0.2 }}
                 className="group relative overflow-hidden rounded-3xl"
               >
-                <img alt={pkg.title} className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-110" src={pkg.image || "https://images.unsplash.com/photo-1580213844993-bc57a990daee"} /> {/* Gunakan pkg.image jika ada */}
+                <img alt={pkg.title} className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-110" src={pkg.media_url || "https://images.unsplash.com/photo-1580213844993-bc57a990daee"} /> {/* Gunakan pkg.image jika ada */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <h3 className="text-2xl font-bold mb-2">{pkg.title}</h3>
-                  <p className="text-gray-300 mb-4">{pkg.description}</p>
-                  <p className="text-2xl font-bold">${pkg.price}</p>
+                  <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
+                  <div className="text-gray-300 mb-4" dangerouslySetInnerHTML={safe(pkg.description)} />
+                  <p className="text-2xl font-bold">${pkg.price_per_pax}</p>
                   <Button
                     className="mt-4 bg-white/20 backdrop-blur-md hover:bg-white/30"
                     onClick={() => navigate(`/package/${pkg.id}`)}
@@ -258,20 +263,21 @@ function Home() {
                 className="group bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-shadow duration-500"
               >
                 <div className="relative h-64 overflow-hidden">
-                  <img alt={transfer.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={transfer.image || "https://images.unsplash.com/photo-1506096023343-0e398a0593e1"} />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2">
+                  <img alt={transfer.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={transfer.media_url || "https://images.unsplash.com/photo-1506096023343-0e398a0593e1"} />
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 drop-shadow-lg">
                     <span className="text-lg font-bold">${transfer.price}</span>
                   </div>
                 </div>
                 <div className="p-8">
-                  <h3 className="text-2xl font-bold mb-3">{transfer.title}</h3>
-                  <p className="text-gray-600 mb-4">{transfer.description}</p>
+                  <h3 className="text-2xl font-bold mb-3">{transfer.name}</h3>
+                  <p className="text-gray-600 mb-4">{transfer.description || "Description placeholder here if needed."}</p> {/* Perlu dicek */}
                   <div className="flex items-center mb-6">
-                    <span className="text-sm font-medium bg-gray-100 rounded-full px-4 py-1">{transfer.duration}</span>
+                    <span className="text-sm font-medium bg-gray-100 rounded-full px-4 py-1">{transfer.duration}</span> {/* Perlu dicek */}
                   </div>
                   {/* Display max passengers for airport transfer */}
+                  {/* Perlu dicek */}
                   {transfer.maxPassengers && <p className="text-sm text-gray-600 mb-2">Max. {transfer.maxPassengers} passengers</p>}
-                  <p className="text-sm text-emerald-600 mb-6">{transfer.highlight}</p>
+                  <p className="text-sm text-emerald-600 mb-6">{transfer.highlight}</p> {/* Perlu dicek */}
                   <Button
                     className="w-full bg-black hover:bg-gray-800"
                     onClick={() => navigate("/airport-transit")}
@@ -319,22 +325,23 @@ function Home() {
                 className="group bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-shadow duration-500"
               >
                 <div className="relative h-64 overflow-hidden">
-                  <img alt={car.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={car.image || "/api/placeholder/400/300"} />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2">
-                    <span className="text-lg font-bold">${car.price}</span>
+                  <img alt={car.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={car.media_url || "/api/placeholder/400/300"} />
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 drop-shadow-lg">
+                    <span className="text-lg font-bold">${car.price_per_day}</span>
                   </div>
                 </div>
                 <div className="p-8">
-                  <h3 className="text-2xl font-bold mb-3">{car.title}</h3>
-                  <p className="text-gray-600 mb-4">{car.description}</p>
+                  <h3 className="text-2xl font-bold mb-3">{car.name || "Car name here"}</h3>
+                  <p className="text-gray-600 mb-4">{car.description || "Description placeholder here."}</p>
                   <div className="flex items-center mb-6">
-                    <span className="text-sm font-medium bg-gray-100 rounded-full px-4 py-1">{car.duration}</span>
+                    <span className="text-sm font-medium bg-gray-100 rounded-full px-4 py-1">{car.duration_per_day}</span>
                   </div>
                   {/* Display "For Groups Only" for Van Car */}
+                  {/* Perlu dicek */}
                   {car.isGroupOnly && (
                     <p className="text-sm text-red-600 mb-2 font-semibold">Khusus Grup</p>
                   )}
-                  <p className="text-sm text-emerald-600 mb-6">{car.highlight}</p>
+                  <p className="text-sm text-emerald-600 mb-6">{car.highlight}</p> {/* Perlu dicek */}
                   <Button
                     className="w-full bg-black hover:bg-gray-800"
                     onClick={() => navigate("/car-detail")}
