@@ -13,6 +13,7 @@ function AirportTransfer() {
   const { toast } = useToast();
   const [selectedDestination, setSelectedDestination] = useState("");
   const [destinations, setDestinations] = useState([]);
+  const [destinationData, setDestinationData] = useState({})
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,9 +32,6 @@ function AirportTransfer() {
         setLoading(true);
         const data = await fetchAirportTransitDestinations();
         setDestinations(data);
-        if (data.length > 0) {
-          setSelectedDestination(data[0].id);
-        }
       } catch (err) {
         setError("Failed to load destinations. Please try again later.");
         console.error(err);
@@ -50,7 +48,12 @@ function AirportTransfer() {
     getDestinations();
   }, []);
 
-  const destinationData = destinations.find((dest) => dest.id === selectedDestination) || destinations[0];
+  useEffect(() => {
+    if (destinations.length > 0) {
+      setSelectedDestination(destinations[0].id);
+      setDestinationData(destinations.find((dest) => dest.id === selectedDestination) || destinations[0]);
+    }
+  })
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -171,15 +174,17 @@ function AirportTransfer() {
 
                       <div className="flex flex-1 gap-4">
                         <div className="w-36 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          <img src={destination.image} alt={destination.name} className="w-full h-full object-cover" />
+                          <img src={destination.media_url} alt={destination.name} className="w-full h-full object-cover" />
                         </div>
 
                         <div>
                           <h3 className="text-xl font-bold text-teal-800">{destination.name}</h3>
                           <p className="text-lg font-medium">
-                            {destination.distance} (${destination.price})
+                            {destination.distance} {/* Satuan jaraknya mana? */} (${destination.price})
                           </p>
-                          <p className="text-sm text-gray-500">{destination.duration}</p>
+
+                          {/* Perlu dicek, tambahkan satuan waktu */}
+                          <p className="text-sm text-gray-500">{destination.duration_fastest} - {destination.duration_latest}</p>
                         </div>
                       </div>
                     </div>
@@ -188,8 +193,8 @@ function AirportTransfer() {
               </div>
             </motion.section>
 
-            {/* What's Included */}
-            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
+            {/* What's Included, perlu dicek benar2 ini buat apa? */}
+            {/* <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
               <div className="grid grid-cols-1 gap-4">
                 {destinationData.includes.map((item, index) => (
@@ -199,7 +204,7 @@ function AirportTransfer() {
                   </div>
                 ))}
               </div>
-            </motion.section>
+            </motion.section> */}
           </div>
 
           {/* Booking Section */}
