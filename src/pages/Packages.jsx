@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import DOMPurify from 'dompurify';
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { useNavigate } from "react-router-dom"
@@ -15,6 +16,8 @@ function Packages() {
   const [isLoading, setIsLoading] = useState(true)
   const [packageList, setPackageList] = useState(null);
   const [error, setError] = useState(null); // State untuk menangani error API
+
+  const safe = html => ({ __html: DOMPurify.sanitize(html) });
   
   // --- START PERUBAHAN DI SINI UNTUK allPackages ---
   const allPackages = [
@@ -189,18 +192,18 @@ function Packages() {
                 <div className="flex flex-col md:flex-row">
                   <div className="md:w-1/3 h-64 md:h-auto relative">
                     <img
-                      alt={pkg.title}
+                      alt={pkg.name}
                       className="w-full h-full object-cover"
-                      src={pkg.image || "https://via.placeholder.com/400x300"}
+                      src={pkg.media_url || "https://via.placeholder.com/400x300"}
                     /> {/* Tambahkan fallback image */}
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2">
-                      <span className="text-lg font-bold">${pkg.price} USD</span>
+                      <span className="text-lg font-bold">${pkg.price_per_pax} USD</span>
                     </div>
                   </div>
                   <div className="md:w-2/3 p-6 md:p-8">
-                    <h3 className="text-2xl font-bold mb-2">{pkg.title}</h3>
+                    <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
                     {/* Menggunakan description yang sudah digabungkan */}
-                    <p className="text-gray-600 mb-6">{pkg.description}</p>
+                    <div className="text-gray-600 mb-6" dangerouslySetInnerHTML={safe(pkg.description)} />
 
                     {/* --- START PERUBAHAN DI SINI UNTUK MENGHAPUS FITUR --- */}
                     {/* Bagian ini dihapus karena fitur sudah digabung ke dalam deskripsi */}

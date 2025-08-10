@@ -10,7 +10,7 @@ export async function fetchTourPackages() {
   if (errorFlags.fetchAll) return null;
   try {
     const response = await api.get('/tour-packages');
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.fetchAll = true;
     console.error('Error fetching tour packages:', error);
@@ -22,7 +22,7 @@ export async function fetchTourPackageById(id) {
   if (errorFlags.fetchById[id]) return null;
   try {
     const response = await api.get(`/tour-packages/${id}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.fetchById[id] = true;
     console.error(`Error fetching tour package with ID ${id}:`, error);
@@ -35,7 +35,7 @@ export async function addTourPackageToCart(itemData) {
   if (errorFlags.addToCart) return null;
   try {
     const response = await api.post('/cart/tour-package', itemData); // Mengirim seluruh objek itemData
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.addToCart = true;
     console.error('Error adding tour package to cart:', error);

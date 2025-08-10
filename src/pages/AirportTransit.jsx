@@ -12,7 +12,8 @@ function AirportTransfer() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedDestination, setSelectedDestination] = useState("");
-  const [destinations, setDestinations] = useState([]); // Pastikan ini inisialisasi dengan array kosong
+  const [destinations, setDestinations] = useState([]);
+  const [destinationData, setDestinationData] = useState({})
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,21 +31,7 @@ function AirportTransfer() {
       try {
         setLoading(true);
         const data = await fetchAirportTransitDestinations();
-        // Pastikan data adalah array sebelum menggunakannya
-        if (Array.isArray(data)) {
-          setDestinations(data);
-          if (data.length > 0) {
-            setSelectedDestination(data[0].id);
-          }
-        } else {
-          // Jika data bukan array (misal null atau undefined dari API), set error
-          setError("Invalid data received for destinations.");
-          toast({
-            title: "Error",
-            description: "Received invalid data for airport transit destinations.",
-            variant: "destructive",
-          });
-        }
+        setDestinations(data);
       } catch (err) {
         setError("Failed to load destinations. Please try again later.");
         console.error(err);
@@ -61,9 +48,12 @@ function AirportTransfer() {
     getDestinations();
   }, []);
 
-  // Pastikan destinations adalah array sebelum memanggil find
-  // Gunakan optional chaining (?.) dan nullish coalescing (??) untuk penanganan yang aman
-  const destinationData = destinations?.find((dest) => dest.id === selectedDestination) ?? destinations?.[0];
+  useEffect(() => {
+    if (destinations.length > 0) {
+      setSelectedDestination(destinations[0].id);
+      setDestinationData(destinations.find((dest) => dest.id === selectedDestination) || destinations[0]);
+    }
+  })
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -74,8 +64,7 @@ function AirportTransfer() {
   };
 
   const calculateTotal = () => {
-    // Pastikan destinationData ada sebelum mengakses propertinya
-    if (!destinationData || typeof destinationData.price === 'undefined') return 0;
+    if (!destinationData) return 0;
     const basePrice = destinationData.price;
     return basePrice * formData.passengers;
   };
@@ -90,16 +79,6 @@ function AirportTransfer() {
       return;
     }
 
-    // Pastikan destinationData ada sebelum membuat order
-    if (!destinationData) {
-      toast({
-        title: "Error",
-        description: "No destination selected or available.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     const orderData = {
       destinationId: selectedDestination,
       type: "airport-transfer",
@@ -109,7 +88,10 @@ function AirportTransfer() {
       flightNumber: formData.flightNumber,
       pickupTerminal: formData.pickupTerminal,
       dropoffAddress: formData.dropoffAddress,
+      // --- PERUBAHAN DI SINI ---
+      // Menambahkan field item_type dengan nilai 'airport_transfer'
       item_type: "airport_transfer",
+      // --- AKHIR PERUBAHAN ---
     };
 
     try {
@@ -147,21 +129,10 @@ function AirportTransfer() {
     );
   }
 
-  // Menambahkan kondisi ini untuk menampilkan pesan jika tidak ada destinasi yang ditemukan
-  // setelah loading selesai dan tidak ada error
-  if (!destinations || destinations.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <p>No airport transfer destinations available.</p>
-      </div>
-    );
-  }
-
-  // Pastikan destinationData tersedia sebelum merender UI utama
   if (!destinationData) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <p className="text-red-500">Selected destination data not found.</p>
+        <p>No airport transfer destinations available.</p>
       </div>
     );
   }
@@ -170,7 +141,7 @@ function AirportTransfer() {
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 pt-20">
       {/* Hero Section */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative h-[40vh] overflow-hidden">
-        <img alt="Airport transfer service" className="w-full h-full object-cover" src="https://placehold.co/1200x600/E0F2F7/000000?text=Airport+Transfer" />
+        <img alt="Airport transfer service" className="w-full h-full object-cover" src="/api/placeholder/1200/600" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
@@ -203,15 +174,17 @@ function AirportTransfer() {
 
                       <div className="flex flex-1 gap-4">
                         <div className="w-36 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          <img src={destination.image || `https://placehold.co/144x96/E0F2F7/000000?text=${destination.name.substring(0, 5)}`} alt={destination.name} className="w-full h-full object-cover" />
+                          <img src={destination.media_url} alt={destination.name} className="w-full h-full object-cover" />
                         </div>
 
                         <div>
                           <h3 className="text-xl font-bold text-teal-800">{destination.name}</h3>
                           <p className="text-lg font-medium">
-                            {destination.distance} (${destination.price})
+                            {destination.distance} {/* Satuan jaraknya mana? */} (${destination.price})
                           </p>
-                          <p className="text-sm text-gray-500">{destination.duration}</p>
+
+                          {/* Perlu dicek, tambahkan satuan waktu */}
+                          <p className="text-sm text-gray-500">{destination.duration_fastest} - {destination.duration_latest}</p>
                         </div>
                       </div>
                     </div>
@@ -220,18 +193,18 @@ function AirportTransfer() {
               </div>
             </motion.section>
 
-            {/* What's Included */}
-            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
+            {/* What's Included, perlu dicek benar2 ini buat apa? */}
+            {/* <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
               <div className="grid grid-cols-1 gap-4">
-                {destinationData.includes && destinationData.includes.map((item, index) => (
+                {destinationData.includes.map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <span className="text-teal-500 text-xl">✓</span>
                     <span className="text-gray-700 text-lg font-medium">{item}</span>
                   </div>
                 ))}
               </div>
-            </motion.section>
+            </motion.section> */}
           </div>
 
           {/* Booking Section */}
