@@ -101,8 +101,6 @@ function Home() {
           fetchAvailableCars()
         ]);
 
-        console.log(tourRes)
-
         // Ambil hanya 3-4 item pertama jika ingin menampilkan "featured" saja
         setTourPackages(tourRes?.length > 0 ? tourRes.slice(0, 3) : []); // Ambil 3 paket tur pertama
         setAirportTransfers(airportRes?.length > 0 ? airportRes.slice(0, 3) : []); // Ambil 3 transfer pertama
@@ -344,7 +342,7 @@ function Home() {
                   <p className="text-sm text-emerald-600 mb-6">{car.highlight}</p> {/* Perlu dicek */}
                   <Button
                     className="w-full bg-black hover:bg-gray-800"
-                    onClick={() => navigate("/car-detail")}
+                    onClick={() => navigate(`/car/${car.id}`)}
                   > {/* Mengarahkan ke halaman car-detail utama */}
                     Rent Now
                   </Button>

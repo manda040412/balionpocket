@@ -49,13 +49,13 @@ function CarDetail() {
     };
 
     getCars();
-  }, [toast]);
+  }, []);
 
   const carData = cars.find((car) => car.id === selectedCarId);
 
   const calculateTotal = () => {
     if (!carData) return 0;
-    if (!selectedDates.start || !selectedDates.end) return carData.price;
+    if (!selectedDates.start || !selectedDates.end) return carData.price_per_day;
 
     const start = new Date(selectedDates.start);
     const end = new Date(selectedDates.end);
@@ -64,7 +64,7 @@ function CarDetail() {
 
     const timeDiff = Math.abs(end.getTime() - start.getTime());
     const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-    return carData.price * days;
+    return carData.price_per_day * days;
   };
 
   const handleRent = async () => {
@@ -199,13 +199,14 @@ function CarDetail() {
 
                       <div className="flex flex-1 gap-4">
                         <div className="w-36 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
+                          <img src={car.media_url} alt={car.name} className="w-full h-full object-cover" />
                         </div>
 
                         <div>
                           <h3 className="text-xl font-bold text-teal-800">{car.name}</h3>
                           <p className="text-lg font-medium">
-                            {car.duration} (${car.price})
+                            {/* Convert jam nya ke satuan yang benar. */}
+                            {car.duration_per_day} (${car.price_per_day})
                           </p>
                         </div>
                       </div>
@@ -216,7 +217,8 @@ function CarDetail() {
             </motion.section>
 
             {/* What's Included */}
-            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
+            {/* Perlu dicek kembali fungsinya buat apa? kepake atau nga? Ini error btw. */}
+            {/* <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
               <div className="grid grid-cols-1 gap-4">
                 {carData.includes.map((item, index) => (
@@ -226,7 +228,7 @@ function CarDetail() {
                   </div>
                 ))}
               </div>
-            </motion.section>
+            </motion.section> */}
           </div>
 
           {/* Booking Section */}
@@ -234,8 +236,9 @@ function CarDetail() {
             <div className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-2 text-teal-800">{carData.name}</h2>
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl font-bold text-teal-800">${carData.price}</span>
-                <span className="text-gray-600 text-lg">({carData.duration})</span>
+                {/* Convert jam nya ke satuan yang benar. */}
+                <span className="text-2xl font-bold text-teal-800">${carData.price_per_day}</span>
+                <span className="text-gray-600 text-lg">({carData.duration_per_day})</span>
               </div>
 
               <div className="space-y-6">

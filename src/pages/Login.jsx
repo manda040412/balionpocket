@@ -16,7 +16,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [redirectPath, setRedirectPath] = useState("/");
 
   // `baseUrl` dari config.js tidak lagi diperlukan karena apiClient mengelolanya.
@@ -36,7 +36,7 @@ function Login() {
 
     console.log("Submit button clicked");
 
-    if (!email || !password || (isRegistering && !name)) {
+    if (!email || !password || (isRegistering && !username)) {
       toast({
         title: "Please fill all fields",
         description: "All fields are required to continue",
@@ -70,7 +70,7 @@ function Login() {
     try {
       let response;
       if (isRegistering) {
-        response = await registerUser({ name, email, password });
+        response = await registerUser({ username, email, password });
         toast({
           title: "Account created",
           description: "Welcome to Bali Corner Tour! You are now logged in.",
@@ -83,12 +83,12 @@ function Login() {
         });
       }
 
-      // Asumsi API mengembalikan { token: "...", user: { id, name, email } }
+      // Asumsi API mengembalikan { token: "...", user: { id, username, email } }
       // Simpan token yang diterima dari backend ke localStorage dengan kunci 'authToken'
       localStorage.setItem("authToken", response.token); // Kunci 'authToken' sesuai apiClient Julius
       localStorage.setItem("isLoggedIn", "true"); // Tetap pertahankan ini untuk kemudahan cek di Navbar/UI
-      localStorage.setItem("userName", response.user.name || name || email); // Ambil dari response, fallback ke input
-      localStorage.setItem("userEmail", response.user.email || email);
+      localStorage.setItem("userName", response.user?.name || username || email); // Ambil dari response, fallback ke input
+      localStorage.setItem("userEmail", response.user?.email || email);
 
       // Memicu event storage agar Navbar atau komponen lain yang mendengarkan bisa update
       window.dispatchEvent(new Event('storage'));
@@ -181,8 +181,8 @@ function Login() {
                       </label>
                       <input
                         type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         className="w-full bg-white/20 text-white placeholder-white/70 border border-white/30 rounded-xl px-4 py-3 focus:ring-2 focus:ring-white focus:border-white focus:bg-white/30"
                         placeholder="Your full name"
                         required
