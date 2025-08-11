@@ -13,7 +13,7 @@ export async function fetchCartItems() {
   if (errorFlags.fetch) return null;
   try {
     const response = await api.get('/cart');
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.fetch = true;
     console.error('Error fetching cart items:', error);
@@ -25,7 +25,7 @@ export async function addItemToCart(itemData) {
   if (errorFlags.add) return null;
   try {
     const response = await api.post('/cart/add', itemData);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.add = true;
     console.error('Error adding item to cart:', error);
@@ -37,7 +37,7 @@ export async function updateCartItemQuantity(itemId, newQuantity) {
   if (errorFlags.update[itemId]) return null;
   try {
     const response = await api.put(`/cart/${itemId}`, { quantity: newQuantity });
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.update[itemId] = true;
     console.error('Error updating cart item quantity:', error);
@@ -49,7 +49,7 @@ export async function removeCartItem(itemId) {
   if (errorFlags.remove[itemId]) return null;
   try {
     const response = await api.delete(`/cart/${itemId}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.remove[itemId] = true;
     console.error('Error removing cart item:', error);
@@ -61,7 +61,7 @@ export async function clearUserCart() {
   if (errorFlags.clear) return null;
   try {
     const response = await api.delete('/cart/clear');
-    return response.data;
+    return response.data.data;
   } catch (error) {
     errorFlags.clear = true;
     console.error('Error clearing cart:', error);

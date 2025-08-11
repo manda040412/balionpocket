@@ -4,15 +4,13 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-// Import fungsi API
+// Import fungsi API yang baru kita buat
 import { fetchAvailableCars, createCarRentalOrder } from '../services/carRentalApi';
 
 function CarDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { id } = useParams();
-  // Inisialisasi selectedCarId langsung dari id yang didapat, atau null
-  const [selectedCarId, setSelectedCarId] = useState(id || null);
+  const [selectedCarId, setSelectedCarId] = useState(null);
   const [selectedDates, setSelectedDates] = useState({
     start: "",
     end: "",
@@ -33,19 +31,9 @@ function CarDetail() {
       setError(null);
       try {
         const data = await fetchAvailableCars();
-        if (Array.isArray(data)) {
-          setCars(data);
-          // Hanya set selectedCarId jika belum ada ID dari URL dan ada data mobil
-          if (!id && data.length > 0) {
-            setSelectedCarId(data[0].id);
-          }
-        } else {
-          setError("Invalid data received for cars.");
-          toast({
-            title: "Error",
-            description: "Received invalid data for car list.",
-            variant: "destructive",
-          });
+        setCars(data);
+        if (data.length > 0) {
+          setSelectedCarId(data[0].id);
         }
       } catch (err) {
         console.error("Error fetching cars:", err);
@@ -59,15 +47,15 @@ function CarDetail() {
         setIsLoading(false);
       }
     };
-    getCars();
-  }, [id]); // Dependensi hanya 'id' karena ini adalah satu-satunya nilai yang dapat menyebabkan perubahan dalam logika pengambilan data. 'toast' tidak perlu dimasukkan karena `useToast` menghasilkan objek yang stabil.
 
-  // Menggunakan optional chaining dan nullish coalescing untuk akses yang aman
-  const carData = cars?.find((car) => car.id === selectedCarId) ?? (cars?.length > 0 ? cars[0] : null);
+    getCars();
+  }, []);
+
+  const carData = cars.find((car) => car.id === selectedCarId);
 
   const calculateTotal = () => {
     if (!carData) return 0;
-    if (!selectedDates.start || !selectedDates.end) return carData.price;
+    if (!selectedDates.start || !selectedDates.end) return carData.price_per_day;
 
     const start = new Date(selectedDates.start);
     const end = new Date(selectedDates.end);
@@ -76,7 +64,7 @@ function CarDetail() {
 
     const timeDiff = Math.abs(end.getTime() - start.getTime());
     const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
-    return carData.price * days;
+    return carData.price_per_day * days;
   };
 
   const handleRent = async () => {
@@ -86,7 +74,7 @@ function CarDetail() {
         description: "Please login to rent a car",
         variant: "destructive",
       });
-      localStorage.setItem("redirectAfterLogin", `/car/${carData?.id}`);
+      localStorage.setItem("redirectAfterLogin", "/car-detail");
       navigate("/login");
       return;
     }
@@ -127,11 +115,14 @@ function CarDetail() {
       carId: carData.id,
       startDate: selectedDates.start,
       endDate: selectedDates.end,
-      item_type: "car_rental",
+      // --- START PERUBAHAN DI SINI ---
+      item_type: "car_rental", // Menambahkan field item_type
+      // --- END PERUBAHAN DI SINI ---
     };
 
     try {
       const response = await createCarRentalOrder(orderData);
+
       localStorage.setItem("currentOrder", JSON.stringify(response));
 
       toast({
@@ -167,18 +158,10 @@ function CarDetail() {
     );
   }
 
-  if (!cars || cars.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <p>No cars available for rental.</p>
-      </div>
-    );
-  }
-
   if (!carData) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
-        <p className="text-red-500">Selected car data not found.</p>
+        <p>No cars available for rental.</p>
       </div>
     );
   }
@@ -187,7 +170,7 @@ function CarDetail() {
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-blue-50 pt-20">
       {/* Hero Section */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative h-[40vh] overflow-hidden">
-        <img alt="Car rental service" className="w-full h-full object-cover" src="https://placehold.co/1200x600/E0F2F7/000000?text=Car+Rental" />
+        <img alt="Car rental service" className="w-full h-full object-cover" src="/api/placeholder/1200/600" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
@@ -216,13 +199,14 @@ function CarDetail() {
 
                       <div className="flex flex-1 gap-4">
                         <div className="w-36 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          <img src={car.image || `https://placehold.co/144x96/E0F2F7/000000?text=${car.name.substring(0, 5)}`} alt={car.name} className="w-full h-full object-cover" />
+                          <img src={car.media_url} alt={car.name} className="w-full h-full object-cover" />
                         </div>
 
                         <div>
                           <h3 className="text-xl font-bold text-teal-800">{car.name}</h3>
                           <p className="text-lg font-medium">
-                            {car.duration} (${car.price})
+                            {/* Convert jam nya ke satuan yang benar. */}
+                            {car.duration_per_day} (${car.price_per_day})
                           </p>
                         </div>
                       </div>
@@ -233,17 +217,18 @@ function CarDetail() {
             </motion.section>
 
             {/* What's Included */}
-            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
+            {/* Perlu dicek kembali fungsinya buat apa? kepake atau nga? Ini error btw. */}
+            {/* <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
               <div className="grid grid-cols-1 gap-4">
-                {carData.includes && carData.includes.map((item, index) => (
+                {carData.includes.map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <span className="text-teal-500 text-xl">✓</span>
                     <span className="text-gray-700 text-lg font-medium">{item}</span>
                   </div>
                 ))}
               </div>
-            </motion.section>
+            </motion.section> */}
           </div>
 
           {/* Booking Section */}
@@ -251,8 +236,9 @@ function CarDetail() {
             <div className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-2 text-teal-800">{carData.name}</h2>
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl font-bold text-teal-800">${carData.price}</span>
-                <span className="text-gray-600 text-lg">({carData.duration})</span>
+                {/* Convert jam nya ke satuan yang benar. */}
+                <span className="text-2xl font-bold text-teal-800">${carData.price_per_day}</span>
+                <span className="text-gray-600 text-lg">({carData.duration_per_day})</span>
               </div>
 
               <div className="space-y-6">
