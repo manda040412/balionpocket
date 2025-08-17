@@ -146,20 +146,20 @@ function Checkout() {
 
       // Panggil API untuk memproses checkout
       const response = await processCheckout(checkoutData);
-
-      toast({
-        title: "Booking Confirmed!",
-        description: response.message || "Your journey details have been sent to your email.",
-      });
+      
+      if (response.status === 200) {
+        toast({
+          title: "Booking Confirmed!",
+          description: response.message || "Your journey details have been sent to your email.",
+        });
+        
+        localStorage.removeItem("currentOrder");
+        localStorage.removeItem("cartItems"); // Mungkin juga kosongkan keranjang
+        // TODO: arahkan user ke  link payment yang berhasil didapatkan setelah checkout
+        // window.location.href = response.data.link;
+      }
 
       // Bersihkan order lokal setelah sukses
-      localStorage.removeItem("currentOrder");
-      localStorage.removeItem("cartItems"); // Mungkin juga kosongkan keranjang
-
-      // Redirect ke halaman sukses atau home
-      setTimeout(() => {
-        navigate("/"); // Atau navigate("/confirmation", { state: { orderId: response.orderId } });
-      }, 2000);
 
     } catch (apiError) {
       console.error("Error during checkout:", apiError);

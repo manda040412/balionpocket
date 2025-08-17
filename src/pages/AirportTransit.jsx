@@ -7,6 +7,7 @@ import { Calendar, Clock, Users, Plane, MapPin } from "lucide-react";
 
 // Import API function
 import { fetchAirportTransitDestinations, createAirportTransferOrder } from '../services/airportTransitApi';
+import { addItemToCart } from "../services/cartApi";
 
 function AirportTransfer() {
   const navigate = useNavigate();
@@ -80,22 +81,20 @@ function AirportTransfer() {
     }
 
     const orderData = {
-      destinationId: selectedDestination,
+      item_id: selectedDestination,
       type: "airport-transfer",
-      date: formData.date,
-      time: formData.time,
-      passengers: formData.passengers,
-      flightNumber: formData.flightNumber,
-      pickupTerminal: formData.pickupTerminal,
-      dropoffAddress: formData.dropoffAddress,
+      date_and_time_arrival: `${formData.date}T${formData.time}`,
+      quantity: formData.passengers,
+      flight_number: formData.flightNumber,
+      pickup_terminal: formData.pickupTerminal,
+      dropoff_address: formData.dropoffAddress,
       // --- PERUBAHAN DI SINI ---
-      // Menambahkan field item_type dengan nilai 'airport_transfer'
-      item_type: "airport_transfer",
+      item_type: "airport_transit",
       // --- AKHIR PERUBAHAN ---
     };
 
     try {
-      const response = await createAirportTransferOrder(orderData);
+      const response = await addItemToCart(orderData);
 
       localStorage.setItem("currentOrder", JSON.stringify(response));
       toast({
@@ -184,7 +183,7 @@ function AirportTransfer() {
                           </p>
 
                           {/* Perlu dicek, tambahkan satuan waktu */}
-                          <p className="text-sm text-gray-500">{destination.duration_fastest} - {destination.duration_latest}</p>
+                          <p className="text-sm text-gray-500">{destination.duration_fastest} Min - {destination.duration_latest} Min</p>
                         </div>
                       </div>
                     </div>

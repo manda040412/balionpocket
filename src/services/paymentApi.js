@@ -33,8 +33,8 @@ export async function confirmPayment(paymentId, confirmationData) {
 export async function processCheckout(checkoutData) {
   if (errorFlags.checkout) return null;
   try {
-    const response = await api.post('/checkout/process', checkoutData);
-    return response.data;
+    const response = await api.post('/checkout', checkoutData);
+    return response;
   } catch (error) {
     errorFlags.checkout = true;
     console.error('Error processing checkout:', error);

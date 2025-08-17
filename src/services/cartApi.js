@@ -24,7 +24,7 @@ export async function fetchCartItems() {
 export async function addItemToCart(itemData) {
   if (errorFlags.add) return null;
   try {
-    const response = await api.post('/cart/add', itemData);
+    const response = await api.post('/cart', itemData);
     return response.data.data;
   } catch (error) {
     errorFlags.add = true;

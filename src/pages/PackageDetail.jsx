@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 import { fetchTourPackageById, addTourPackageToCart } from '../services/tourPackageApi'; // Pastikan path ini benar
+import { addItemToCart } from "../services/cartApi";
 
 function PackageDetail() {
   const { id } = useParams();
@@ -107,16 +108,16 @@ function PackageDetail() {
     try {
       // --- START PERUBAHAN DI SINI ---
       const itemToAdd = {
-        packageId: packageData.id,
+        item_id: packageData.id,
         quantity: quantity,
-        selectedDate: selectedDate,
+        tour_date: selectedDate,
         // Menambahkan field item_type
         item_type: "tour_package",
       };
 
       // Panggil fungsi API untuk menambahkan item ke keranjang
       // Sesuaikan `addTourPackageToCart` agar menerima objek itemToAdd
-      const response = await addTourPackageToCart(itemToAdd);
+      const response = await addItemToCart(itemToAdd);
       // --- END PERUBAHAN DI SINI ---
 
       localStorage.setItem("currentOrder", JSON.stringify(response));
@@ -126,7 +127,7 @@ function PackageDetail() {
         description: `${packageData.title} has been added to your cart!`,
       });
 
-      navigate("/cart");
+      // navigate("/cart");
     } catch (apiError) {
       console.error("Error adding package to cart:", apiError);
       toast({

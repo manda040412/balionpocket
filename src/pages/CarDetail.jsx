@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 
 // Import fungsi API yang baru kita buat
 import { fetchAvailableCars, createCarRentalOrder } from '../services/carRentalApi';
+import { addItemToCart } from "../services/cartApi";
 
 function CarDetail() {
   const navigate = useNavigate();
@@ -112,16 +113,16 @@ function CarDetail() {
     }
 
     const orderData = {
-      carId: carData.id,
-      startDate: selectedDates.start,
-      endDate: selectedDates.end,
+      item_id: carData.id,
+      start_date: selectedDates.start,
+      end_date: selectedDates.end,
       // --- START PERUBAHAN DI SINI ---
       item_type: "car_rental", // Menambahkan field item_type
       // --- END PERUBAHAN DI SINI ---
     };
 
     try {
-      const response = await createCarRentalOrder(orderData);
+      const response = await addItemToCart(orderData);
 
       localStorage.setItem("currentOrder", JSON.stringify(response));
 
@@ -130,7 +131,7 @@ function CarDetail() {
         description: `Your ${carData.name} rental has been added to cart`,
       });
 
-      navigate("/checkout");
+      // navigate("/checkout");
     } catch (apiError) {
       console.error("Error submitting car rental order:", apiError);
       toast({
@@ -206,7 +207,7 @@ function CarDetail() {
                           <h3 className="text-xl font-bold text-teal-800">{car.name}</h3>
                           <p className="text-lg font-medium">
                             {/* Convert jam nya ke satuan yang benar. */}
-                            {car.duration_per_day} (${car.price_per_day})
+                            {car.duration_per_day} Hours/day (${car.price_per_day})
                           </p>
                         </div>
                       </div>
@@ -238,7 +239,7 @@ function CarDetail() {
               <div className="flex items-center gap-2 mb-4">
                 {/* Convert jam nya ke satuan yang benar. */}
                 <span className="text-2xl font-bold text-teal-800">${carData.price_per_day}</span>
-                <span className="text-gray-600 text-lg">({carData.duration_per_day})</span>
+                <span className="text-gray-600 text-lg">{carData.duration_per_day} Hour/day</span>
               </div>
 
               <div className="space-y-6">
