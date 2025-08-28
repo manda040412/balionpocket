@@ -44,6 +44,7 @@ function Navbar() {
   }, [location.pathname]);
 
   const handleLogout = () => {
+    localStorage.clear();
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
@@ -89,22 +90,21 @@ function Navbar() {
             </Link>
 
             {isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <div className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white" : "text-gray-900"}`}>Hello, {userName}</div>
-                <Link to="/profile" className={`p-2 rounded-full hover:bg-gray-100 ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80 hover:bg-white/10" : "text-gray-700 hover:text-blue-600"}`}>
-                  <User className="w-5 h-5" />
-                </Link>
-                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`} onClick={handleLogout}>
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <Link to="/login">
-                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`}>
-                  Sign In
-                </Button>
-              </Link>
-            )}
+              <div className="flex items-center space-x-4">
+                <Link to="/profile" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-900 hover:text-blue-600"} transition-colors duration-300`}>
+                  Hello, {userName}
+                </Link>
+                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`} onClick={handleLogout}>
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link to="/login">
+                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`}>
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -114,9 +114,9 @@ function Navbar() {
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            {/* <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               {isMobileMenuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
-            </svg>
+            </svg> */}
           </button>
         </div>
 

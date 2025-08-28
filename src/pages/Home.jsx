@@ -35,6 +35,7 @@ function Home() {
 
   // Effect untuk auto-scrolling testimonials (tetap seperti semula)
   useEffect(() => {
+    // localStorage.clear();
     const testimonialsEl = testimonialsRef.current;
     if (!testimonialsEl) return;
 

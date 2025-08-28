@@ -6,7 +6,7 @@ import { User, Package, ShoppingCart, LogOut } from "lucide-react";
 
 // Import API functions
 import { fetchUserProfile, updateUserProfile, fetchUserOrders } from '../services/userApi';
-import { logoutUser } from '../services/authApi'; // Pastikan ini diimpor dari authApi
+import { logoutUser } from '../services/authApi';
 
 function Profile() {
   const navigate = useNavigate();
@@ -22,29 +22,37 @@ function Profile() {
 
   // Effect untuk memeriksa status login dan mengambil data profil/pesanan
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); // Menggunakan 'authToken' untuk cek login
+    const token = localStorage.getItem("authToken");
     if (!token) {
       console.log("No auth token found, redirecting to login");
-      setIsLoggedIn(false); // Pastikan state isLoggedIn false
+      setIsLoggedIn(false);
       navigate("/login");
       return;
     }
     setIsLoggedIn(true);
 
-    // Fetch User Profile
     const getUserProfile = async () => {
       setIsLoadingProfile(true);
       setProfileError(null);
       try {
         const profile = await fetchUserProfile();
-        setUserName(profile.name || "User");
-        setUserEmail(profile.email || "");
-        // Update localStorage juga, agar Navbar bisa update
-        localStorage.setItem("userName", profile.name || "User");
-        localStorage.setItem("userEmail", profile.email || "");
+        if (profile) {
+          setUserName(profile.name || "User");
+          setUserEmail(profile.email || "");
+          localStorage.setItem("userName", profile.name || "User");
+          localStorage.setItem("userEmail", profile.email || "");
+        } else {
+          // Handle case where API response is valid but data is null/empty
+          setProfileError("No profile data found.");
+          toast({
+            title: "Error",
+            description: "No profile data found from the server.",
+            variant: "destructive",
+          });
+        }
       } catch (err) {
         console.error("Error fetching user profile:", err);
-        setProfileError(err.response?.data?.message || "Failed to load user profile.");
+        setProfileError(err.response?.data?.message || "Failed to load user profile. Check API endpoint.");
         toast({
           title: "Error",
           description: "Failed to load profile data.",
@@ -55,16 +63,19 @@ function Profile() {
       }
     };
 
-    // Fetch User Orders
     const getUserOrders = async () => {
       setIsLoadingOrders(true);
       setOrdersError(null);
       try {
         const userOrders = await fetchUserOrders();
-        setOrders(userOrders);
+        if (userOrders) {
+          setOrders(userOrders);
+        } else {
+          setOrders([]); // Set orders to empty array if response is null
+        }
       } catch (err) {
         console.error("Error fetching user orders:", err);
-        setOrdersError(err.response?.data?.message || "Failed to load your orders.");
+        setOrdersError(err.response?.data?.message || "Failed to load your orders. Check API endpoint.");
         toast({
           title: "Error",
           description: "Failed to load order history.",
@@ -78,18 +89,15 @@ function Profile() {
     getUserProfile();
     getUserOrders();
 
-  }, [navigate, toast]); // Tambahkan toast ke dependencies
+  }, [navigate, toast]);
 
-  // Handle Update Profile
   const handleUpdateProfile = async () => {
     try {
-      // Hanya kirim data yang bisa diubah (nama)
       await updateUserProfile({ name: userName });
       toast({
         title: "Profile updated",
         description: "Your information has been updated successfully",
       });
-      // Memicu event storage agar Navbar bisa update nama jika perlu
       window.dispatchEvent(new Event('storage'));
     } catch (err) {
       console.error("Error updating profile:", err);
@@ -101,17 +109,14 @@ function Profile() {
     }
   };
 
-  // Handle Sign Out
   const handleSignOut = async () => {
     try {
-      // Panggil API logout jika backend Anda membutuhkannya
       await logoutUser();
       toast({
         title: "Signed out successfully",
         description: "You have been logged out of your account",
       });
     } catch (err) {
-      // Walaupun ada error dari API logout, kita tetap hapus token dari frontend
       console.error("API Logout failed, but proceeding with client-side logout:", err);
       toast({
         title: "Sign Out Issue",
@@ -119,20 +124,16 @@ function Profile() {
         variant: "destructive"
       });
     } finally {
-      // Hapus semua data login dari localStorage
-      localStorage.removeItem("authToken"); // Hapus token utama
+      localStorage.removeItem("authToken");
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("userName");
       localStorage.removeItem("userEmail");
-      localStorage.removeItem("redirectAfterLogin"); // Bersihkan juga ini
-
-      // Memicu event storage agar Navbar/komponen lain update status login
+      localStorage.removeItem("redirectAfterLogin");
       window.dispatchEvent(new Event('storage'));
-      navigate("/"); // Redirect ke halaman utama atau login page
+      navigate("/");
     }
   };
 
-  // Tampilkan loading state atau redirect jika tidak login
   if (!isLoggedIn || isLoadingProfile || isLoadingOrders) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
@@ -147,19 +148,17 @@ function Profile() {
     );
   }
 
-  // Tampilkan error jika gagal memuat profil atau pesanan
   if (profileError || ordersError) {
-      return (
-          <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
-              <div className="text-center">
-                  <h2 className="text-2xl font-bold mb-4 text-red-600">Error Loading Data</h2>
-                  <p className="text-gray-600 mb-4">{profileError || ordersError}</p>
-                  <Button onClick={() => window.location.reload()}>Reload Page</Button>
-              </div>
-          </div>
-      );
+    return (
+      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4 text-red-600">Error Loading Data</h2>
+          <p className="text-gray-600 mb-4">{profileError || ordersError}</p>
+          <Button onClick={() => window.location.reload()}>Reload Page</Button>
+        </div>
+      </div>
+    );
   }
-
 
   return (
     <div className="min-h-screen bg-gray-50 pt-24">
@@ -250,9 +249,8 @@ function Profile() {
                     <input
                       type="email"
                       value={userEmail}
-                      // onChange={(e) => setUserEmail(e.target.value)} // Email biasanya tidak bisa diubah
                       className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500"
-                      disabled // Nonaktifkan input email karena tidak bisa diubah
+                      disabled
                     />
                     <p className="text-sm text-gray-500 mt-1">Email cannot be changed</p>
                   </div>
@@ -260,7 +258,7 @@ function Profile() {
                   <div className="pt-4">
                     <Button
                       className="bg-blue-600 hover:bg-blue-700"
-                      onClick={handleUpdateProfile} // Panggil fungsi API
+                      onClick={handleUpdateProfile}
                     >
                       Update Profile
                     </Button>
@@ -272,20 +270,19 @@ function Profile() {
                   <div className="mt-10">
                     <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
                     <div className="space-y-4">
-                      {orders.slice(0, 3).map((order) => ( // Tidak perlu index sebagai key jika ada ID unik
+                      {orders.slice(0, 3).map((order, index) => (
                         <div
-                          key={order.id || JSON.stringify(order)} // Gunakan order.id jika ada, fallback ke JSON.stringify
+                          key={order.id || index}
                           className="border rounded-xl p-4 hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex justify-between">
                             <div>
                               <h4 className="font-medium">{order.title}</h4>
                               <p className="text-sm text-gray-600">
-                                {/* Asumsi order.date ada dan bisa di-parse */}
                                 Date: {new Date(order.date).toLocaleDateString()}
                               </p>
                               <p className="text-sm text-gray-600">
-                                Guests: {order.quantity || order.passengers || 1} {/* Sesuaikan properti untuk jumlah orang */}
+                                Guests: {order.quantity || order.passengers || 1}
                               </p>
                             </div>
                             <div className="text-right">
@@ -307,10 +304,10 @@ function Profile() {
                     </div>
                   </div>
                 ) : (
-                    <div className="mt-10 text-center text-gray-600">
-                        <p>No recent orders found.</p>
-                        <Button variant="link" onClick={() => navigate("/packages")}>Start exploring packages!</Button>
-                    </div>
+                  <div className="mt-10 text-center text-gray-600">
+                    <p>No recent orders found.</p>
+                    <Button variant="link" onClick={() => navigate("/packages")}>Start exploring packages!</Button>
+                  </div>
                 )}
               </div>
             </div>
