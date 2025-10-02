@@ -111,7 +111,7 @@ function Packages() {
     : packages.filter(pkg => pkg.category === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-16">
+    <div className="min-h-screen bg-gray-50 pt-16 pb-16">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -220,7 +220,7 @@ function Packages() {
                     {/* --- END PERUBAHAN DI SINI UNTUK MENGHAPUS FITUR --- */}
 
                     <Button
-                      className="mt-6 bg-black hover:bg-gray-800"
+                      className="mt-6 "
                       onClick={(e) => {
                         e.stopPropagation(); // Mencegah onClick pada div parent
                         navigate(`/package/${pkg.id}`);

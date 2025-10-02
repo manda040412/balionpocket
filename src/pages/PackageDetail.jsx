@@ -127,7 +127,7 @@ function PackageDetail() {
         description: `${packageData.title} has been added to your cart!`,
       });
 
-      // navigate("/cart");
+      navigate("/cart");
     } catch (apiError) {
       console.error("Error adding package to cart:", apiError);
       toast({
@@ -179,7 +179,7 @@ function PackageDetail() {
             <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="max-w-3xl text-white">
               <h1 className="text-3xl md:text-5xl font-bold mb-4">{packageData.name}</h1>
               {/* <p className="">{packageData.description}</p> */}
-              <div className="text-base md:text-xl mb-6" dangerouslySetInnerHTML={safe(packageData.description)} />
+              {/* <div className="text-base md:text-xl mb-6" dangerouslySetInnerHTML={safe(packageData.description)} /> */}
               <div className="flex flex-wrap gap-4 text-sm md:text-base">
                 <div className="flex items-center gap-2">
                   <span className="text-xl md:text-2xl">⏱</span>
@@ -251,7 +251,7 @@ function PackageDetail() {
 
                   <Button
                     size="lg"
-                    className="w-full text-lg bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white"
+                    className="w-full text-lg bg-gradient-to-r hover:bg-teal-600/50 text-white"
                     onClick={handleOrder}
                   >
                     {isLoggedIn ? "Add to Cart" : "Login & Add to Cart"}

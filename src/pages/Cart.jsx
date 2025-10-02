@@ -41,7 +41,7 @@ function Cart() {
   }, []);
 
   const cartTotal = cartItems.reduce((total, item) => {
-    return total + (item.price * item.quantity);
+    return total + item.price_total;
   }, 0);
 
   // Mengupdate kuantitas item melalui API
@@ -224,7 +224,7 @@ function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-16">
+    <div className="min-h-screen bg-gray-50 pt-16 pb-16">
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -289,7 +289,7 @@ function Cart() {
                           <img
                             alt={item.title}
                             className="w-full h-full object-cover"
-                            src={item.image || "/api/placeholder/400/300"}
+                            src={item.detail.media_url || "/api/placeholder/400/300"}
                           />
                           <div className="absolute bottom-0 left-0 bg-blue-600 text-white px-3 py-1 text-sm font-medium">
                             {item.type}
@@ -297,7 +297,7 @@ function Cart() {
                         </div>
                         <div className="sm:w-2/3 p-6">
                           <div className="flex justify-between items-start">
-                            <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                            <h3 className="text-xl font-bold mb-2">{item.detail?.name}</h3>
                             <button
                               onClick={() => handleRemoveItem(item.id)} // Panggil fungsi API
                               className="text-gray-400 hover:text-red-500 transition-colors"
@@ -311,7 +311,11 @@ function Cart() {
                           {/* Booking Dates Section */}
                           <div className="mb-4">
                             <BookingDatesDisplay
-                              bookingDates={item.bookingDates}
+                              bookingDates={{
+                                start: item.start_rent_date,
+                                end: item.end_rent_date,
+                                date: item.date_and_time_arrival ?? item.tour_package_date
+                              }}
                               type={item.type}
                             />
                           </div>
@@ -320,25 +324,25 @@ function Cart() {
                           {/* Pastikan `item.details` berisi properti yang sesuai dengan data dari API */}
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             {/* People count */}
-                            {item.details?.people && (
+                            {item.total_people && (
                               <div className="flex items-center text-sm text-gray-700">
                                 <Users className="w-4 h-4 mr-2" />
-                                <span>{item.details.people} {item.details.people > 1 ? 'People' : 'Person'}</span>
+                                <span>{item.total_people} {item.total_people > 1 ? 'People' : 'Person'}</span>
                               </div>
                             )}
 
                             {/* Flight numbers */}
-                            {item.details?.flightNumber && (
+                            {item.details?.flight_number && (
                               <div className="flex items-center text-sm text-gray-700">
                                 <Plane className="w-4 h-4 mr-2" />
-                                <span>Flight: {item.details.flightNumber}</span>
+                                <span>Flight: {item.details.flight_number}</span>
                               </div>
                             )}
 
-                            {item.details?.arrivalFlight && (
+                            {item.date_and_time_arrival && (
                               <div className="flex items-center text-sm text-gray-700">
                                 <Plane className="w-4 h-4 mr-2" />
-                                <span>Arrival Flight: {item.details.arrivalFlight}</span>
+                                <span>Arrival Flight: {item.date_and_time_arrival}</span>
                               </div>
                             )}
 
@@ -357,10 +361,10 @@ function Cart() {
                             )}
 
                             {/* Dropoff address */}
-                            {item.details?.dropoffAddress && (
+                            {item.details?.dropoff_address && (
                               <div className="flex items-start text-sm text-gray-700 col-span-2">
                                 <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
-                                <span>Dropoff: {item.details.dropoffAddress}</span>
+                                <span>Dropoff: {item.details.dropoff_address}</span>
                               </div>
                             )}
 
@@ -382,23 +386,23 @@ function Cart() {
                           <div className="flex justify-between items-center mt-4">
                             <div className="flex items-center space-x-2">
                               <button
-                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} // Panggil fungsi API
+                                onClick={() => handleUpdateQuantity(item.id, item.total_people - 1)} // Panggil fungsi API
                                 className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                               >
                                 <Minus size={16} />
                               </button>
                               <span className="font-medium text-lg min-w-8 text-center">
-                                {item.quantity}
+                                {item.total_people}
                               </span>
                               <button
-                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} // Panggil fungsi API
+                                onClick={() => handleUpdateQuantity(item.id, item.total_people + 1)} // Panggil fungsi API
                                 className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                               >
                                 <Plus size={16} />
                               </button>
                             </div>
                             <p className="font-bold text-xl">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              ${(item.price_total).toFixed(2)}
                             </p>
                           </div>
                         </div>
@@ -442,9 +446,6 @@ function Cart() {
                     <div className="mt-6 space-y-4">
                       <h3 className="font-medium">Accepted Payment Methods</h3>
                       <div className="flex gap-2">
-                        <div className="p-2 bg-gray-100 rounded">
-                          <span className="text-xl">💳</span>
-                        </div>
                         <div className="p-2 bg-gray-100 rounded">
                           <span className="text-xl">🅿️</span>
                         </div>

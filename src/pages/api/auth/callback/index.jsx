@@ -1,14 +1,19 @@
+import { useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
-export default function Callback () {
+export default function AuthCallback () {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const navigate = useNavigate();
     
-    if(queryParams.get("token")) {
-        localStorage.setItem("authToken", queryParams.get("token"));
-        navigate('/');
-    }
+    useEffect(() => {
+        if(queryParams.get("token")) {
+            localStorage.setItem("authToken", queryParams.get("token"));
+            navigate("/")
+        } else {
+            navigate("/login")
+        }
+    }, [])
     
     return (
         <p>Okay</p>

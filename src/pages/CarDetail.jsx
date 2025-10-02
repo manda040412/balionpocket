@@ -124,14 +124,12 @@ function CarDetail() {
     try {
       const response = await addItemToCart(orderData);
 
-      localStorage.setItem("currentOrder", JSON.stringify(response));
-
       toast({
         title: "Car Reserved",
         description: `Your ${carData.name} rental has been added to cart`,
       });
 
-      // navigate("/checkout");
+      navigate("/cart");
     } catch (apiError) {
       console.error("Error submitting car rental order:", apiError);
       toast({
@@ -219,17 +217,27 @@ function CarDetail() {
 
             {/* What's Included */}
             {/* Perlu dicek kembali fungsinya buat apa? kepake atau nga? Ini error btw. */}
-            {/* <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
+            <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-3xl p-8 shadow-lg">
               <h2 className="text-3xl font-bold mb-6 text-teal-800">What's Included</h2>
               <div className="grid grid-cols-1 gap-4">
-                {carData.includes.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <span className="text-teal-500 text-xl">✓</span>
-                    <span className="text-gray-700 text-lg font-medium">{item}</span>
-                  </div>
-                ))}
+                <div className="flex items-center gap-3">
+                  <span className="text-teal-500 text-xl">✓</span>
+                  <span className="text-gray-700 text-lg font-medium">Private Car</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-teal-500 text-xl">✓</span>
+                  <span className="text-gray-700 text-lg font-medium">Driver</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-teal-500 text-xl">✓</span>
+                  <span className="text-gray-700 text-lg font-medium">Petrol</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-teal-500 text-xl">✓</span>
+                  <span className="text-gray-700 text-lg font-medium">Parking Tol</span>
+                </div>
               </div>
-            </motion.section> */}
+            </motion.section>
           </div>
 
           {/* Booking Section */}

@@ -42,6 +42,18 @@ export async function processCheckout(checkoutData) {
   }
 }
 
+export async function requestPaymentLink(checkoutData) {
+  if (errorFlags.checkout) return null;
+  try {
+    const response = await api.post('/payment/inquire', checkoutData);
+    return response;
+  } catch (error) {
+    errorFlags.checkout = true;
+    console.error('Error processing checkout:', error);
+    return null;
+  }
+}
+
 // Untuk reset error flags
 export function resetPaymentApiErrorFlags() {
   errorFlags = {

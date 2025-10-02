@@ -6,7 +6,7 @@ let errorFlags = {
   update: {},
   remove: {},
   clear: false,
-};
+}
 
 // Mengambil semua item di keranjang pengguna saat ini
 export async function fetchCartItems() {
@@ -17,7 +17,7 @@ export async function fetchCartItems() {
   } catch (error) {
     errorFlags.fetch = true;
     console.error('Error fetching cart items:', error);
-    return null;
+    return [];
   }
 }
 

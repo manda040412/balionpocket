@@ -13,7 +13,9 @@
     import Profile from "./pages/Profile";
     import CompanyProfile from './pages/CompanyProfile'; // Keep this import
     import Cart from './pages/Cart';
-    import Callback from "./pages/api/auth/callback";
+    import OrderList from './pages/OrderList';
+    import AuthCallback from "./pages/api/auth/callback";
+    import PaymentCallback from "./pages/api/payment/callback";
 
     import ProtectedRoute from './components/ProtectedRoute';
     import PublicRoute from './components/PublicRoute';
@@ -31,7 +33,7 @@
               <Route path="/package/:id" element={<PackageDetail />} />
               <Route path="/car/:id" element={<CarDetail />} />
               <Route path="/airport-transit" element={<AirportTransit />} />
-              <Route path="/api/auth/callback" element={<Callback />} />
+              <Route path="/api/auth/callback" element={<AuthCallback />} />
               <Route path="/company-profile" element={<CompanyProfile />} /> {/* <-- Moved here to be public */}
 
               {/* Rute yang hanya bisa diakses oleh pengguna yang BELUM login */}
@@ -45,6 +47,8 @@
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/order-list" element={<OrderList />} />
+                <Route path="/api/payment/callback" element={<PaymentCallback />} />
               </Route>
 
               {/* Rute untuk halaman 404 (Not Found) */}

@@ -248,8 +248,7 @@ function Login() {
                     transition={{ delay: 0.6 }}
                   >
                     <Button
-                      type="submit"
-                      className="w-full text-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-xl shadow-lg"
+                      className="w-full text-lg py-3 rounded-xl shadow-lg"
                       disabled={isLoading}
                     >
                       {isLoading ? (

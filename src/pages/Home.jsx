@@ -213,7 +213,7 @@ function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-8">
                   <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
-                  <div className="text-gray-300 mb-4" dangerouslySetInnerHTML={safe(pkg.description)} />
+                  {/* <div className="text-gray-300 mb-4" dangerouslySetInnerHTML={safe(pkg.description)} /> */}
                   <p className="text-2xl font-bold">${pkg.price_per_pax}</p>
                   <Button
                     className="mt-4 bg-white/20 backdrop-blur-md hover:bg-white/30"

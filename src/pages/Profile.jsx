@@ -5,8 +5,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { User, Package, ShoppingCart, LogOut } from "lucide-react";
 
 // Import API functions
-import { fetchUserProfile, updateUserProfile, fetchUserOrders } from '../services/userApi';
-import { logoutUser } from '../services/authApi';
+import { fetchUserProfile, updateUserProfile } from '../services/userApi';
+import { logoutUser } from '../services/authApi'; // Pastikan ini diimpor dari authApi
 
 function Profile() {
   const navigate = useNavigate();
@@ -14,11 +14,8 @@ function Profile() {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [orders, setOrders] = useState([]);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
   const [profileError, setProfileError] = useState(null);
-  const [ordersError, setOrdersError] = useState(null);
 
   // Effect untuk memeriksa status login dan mengambil data profil/pesanan
   useEffect(() => {
@@ -87,13 +84,13 @@ function Profile() {
     };
 
     getUserProfile();
-    getUserOrders();
 
-  }, [navigate, toast]);
+  }, []); // Tambahkan toast ke dependencies
 
   const handleUpdateProfile = async () => {
     try {
-      await updateUserProfile({ name: userName });
+      // Hanya kirim data yang bisa diubah (nama)
+      await updateUserProfile({ username: userName });
       toast({
         title: "Profile updated",
         description: "Your information has been updated successfully",
@@ -134,7 +131,8 @@ function Profile() {
     }
   };
 
-  if (!isLoggedIn || isLoadingProfile || isLoadingOrders) {
+  // Tampilkan loading state atau redirect jika tidak login
+  if (!isLoggedIn || isLoadingProfile) {
     return (
       <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
         <div className="text-center">
@@ -148,26 +146,27 @@ function Profile() {
     );
   }
 
-  if (profileError || ordersError) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4 text-red-600">Error Loading Data</h2>
-          <p className="text-gray-600 mb-4">{profileError || ordersError}</p>
-          <Button onClick={() => window.location.reload()}>Reload Page</Button>
-        </div>
-      </div>
-    );
+  // Tampilkan error jika gagal memuat profil atau pesanan
+  if (profileError) {
+      return (
+          <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+              <div className="text-center">
+                  <h2 className="text-2xl font-bold mb-4 text-red-600">Error Loading Data</h2>
+                  <p className="text-gray-600 mb-4">{profileError}</p>
+                  <Button onClick={() => window.location.reload()}>Reload Page</Button>
+              </div>
+          </div>
+      );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-24">
       <div className="container mx-auto px-4 py-8">
         <div
-          className="max-w-4xl mx-auto"
+          className="mx-auto"
         >
           {/* Profile Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 shadow-lg text-white mb-8">
+          <div className="bg-primary rounded-3xl p-8 shadow-lg text-white mb-8">
             <div className="flex items-center">
               <div className="bg-white/20 w-20 h-20 rounded-full flex items-center justify-center text-4xl">
                 <User size={40} />
@@ -188,7 +187,7 @@ function Profile() {
                   <h2 className="text-xl font-bold mb-4">Account</h2>
                   <div className="space-y-4">
                     <Button
-                      variant="outline"
+                      variant="default"
                       className="w-full justify-start text-left"
                       onClick={() => navigate("/profile")}
                     >
@@ -198,7 +197,7 @@ function Profile() {
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left"
-                      onClick={() => navigate("/orders")}
+                      onClick={() => navigate("/order-list")}
                     >
                       <Package className="mr-2 h-4 w-4" />
                       My Orders
@@ -257,58 +256,13 @@ function Profile() {
 
                   <div className="pt-4">
                     <Button
-                      className="bg-blue-600 hover:bg-blue-700"
-                      onClick={handleUpdateProfile}
+                      onClick={handleUpdateProfile} // Panggil fungsi API
                     >
                       Update Profile
                     </Button>
                   </div>
                 </div>
-
-                {/* Recent Orders Section */}
-                {orders.length > 0 ? (
-                  <div className="mt-10">
-                    <h3 className="text-xl font-bold mb-4">Recent Orders</h3>
-                    <div className="space-y-4">
-                      {orders.slice(0, 3).map((order, index) => (
-                        <div
-                          key={order.id || index}
-                          className="border rounded-xl p-4 hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex justify-between">
-                            <div>
-                              <h4 className="font-medium">{order.title}</h4>
-                              <p className="text-sm text-gray-600">
-                                Date: {new Date(order.date).toLocaleDateString()}
-                              </p>
-                              <p className="text-sm text-gray-600">
-                                Guests: {order.quantity || order.passengers || 1}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold">${order.total}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-
-                      {orders.length > 3 && (
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => navigate("/orders")}
-                        >
-                          View All Orders
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-10 text-center text-gray-600">
-                    <p>No recent orders found.</p>
-                    <Button variant="link" onClick={() => navigate("/packages")}>Start exploring packages!</Button>
-                  </div>
-                )}
+                
               </div>
             </div>
           </div>

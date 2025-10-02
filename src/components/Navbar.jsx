@@ -2,31 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, User } from "lucide-react";
+import { isLogin } from "../lib/utils";
 
 function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
 
-  const checkLoginStatus = () => {
-    const loginStatus = localStorage.getItem("isLoggedIn") === "true";
-    const storedUserName = localStorage.getItem("userName") || "";
-    setIsLoggedIn(loginStatus);
-    setUserName(storedUserName);
-  };
-
   useEffect(() => {
-    checkLoginStatus();
-    
-    const handleStorageChange = () => {
-      checkLoginStatus();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -34,20 +19,15 @@ function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
   useEffect(() => {
-    checkLoginStatus();
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
   const handleLogout = () => {
-    localStorage.clear();
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userName");
-    setIsLoggedIn(false);
+    localStorage.removeItem("authToken");
     setUserName("");
     navigate("/");
   };
@@ -89,22 +69,23 @@ function Navbar() {
               <ShoppingCart className="w-5 h-5" />
             </Link>
 
-            {isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <Link to="/profile" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-900 hover:text-blue-600"} transition-colors duration-300`}>
-                  Hello, {userName}
-                </Link>
-                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`} onClick={handleLogout}>
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <Link to="/login">
-                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`}>
-                  Sign In
-                </Button>
-              </Link>
-            )}
+            {isLogin() ? (
+              <div className="flex items-center space-x-4">
+                <div className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white" : "text-gray-900"}`}>Hello, {userName}</div>
+                <Link to="/profile" className={`p-2 rounded-full hover:bg-gray-100 ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80 hover:bg-white/10" : "text-gray-700 hover:text-blue-600"}`}>
+                  <User className="w-5 h-5" />
+                </Link>
+                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`} onClick={handleLogout}>
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link to="/login">
+                <Button variant="outline" className={`text-sm md:text-base ${buttonClass}`}>
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -146,7 +127,7 @@ function Navbar() {
                 <span>Cart</span>
               </Link>
 
-              {isLoggedIn ? (
+              {isLogin() ? (
                 <div className="flex flex-col space-y-4">
                   <div className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white" : "text-gray-900"}`}>Hello, {userName}</div>
                   <Link to="/profile" className={`flex items-center space-x-2 font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>

@@ -9,7 +9,7 @@ let errorFlags = {
 export async function fetchUserProfile() {
   if (errorFlags.profile) return null;
   try {
-    const response = await api.get('/user/profile');
+    const response = await api.get('/me');
     return response.data;
   } catch (error) {
     errorFlags.profile = true;
@@ -21,7 +21,7 @@ export async function fetchUserProfile() {
 export async function updateUserProfile(profileData) {
   if (errorFlags.updateProfile) return null;
   try {
-    const response = await api.put('/user/profile', profileData);
+    const response = await api.put('/profile/update', profileData);
     return response.data;
   } catch (error) {
     errorFlags.updateProfile = true;
@@ -33,7 +33,7 @@ export async function updateUserProfile(profileData) {
 export async function fetchUserOrders() {
   if (errorFlags.orders) return null;
   try {
-    const response = await api.get('/user/orders');
+    const response = await api.get('/payment/list');
     return response.data;
   } catch (error) {
     errorFlags.orders = true;

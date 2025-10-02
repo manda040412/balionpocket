@@ -17,7 +17,7 @@ function Checkout() {
     phone: "",
     nationality: "",
     specialRequests: "",
-    paymentMethod: "credit-card",
+    paymentMethod: "paypal",
     cardNumber: "",
     cardExpiry: "",
     cardCVC: ""
@@ -62,7 +62,7 @@ function Checkout() {
       });
       navigate("/"); // Redirect ke home atau halaman paket jika tidak ada order
     }
-  }, [navigate, toast]);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -136,11 +136,6 @@ function Checkout() {
           // Jangan kirim data kartu kredit sensitif langsung ke backend di aplikasi nyata
           // Gunakan Payment Gateway SDK (Stripe.js, Midtrans.js, dll.) untuk tokenisasi kartu
           // Di sini kita hanya menyimulasikan pengiriman data mentah untuk tujuan belajar
-          ...(formData.paymentMethod === "credit-card" && {
-            cardNumber: formData.cardNumber,
-            cardExpiry: formData.cardExpiry,
-            cardCVC: formData.cardCVC,
-          }),
         },
       };
 
@@ -155,8 +150,9 @@ function Checkout() {
         
         localStorage.removeItem("currentOrder");
         localStorage.removeItem("cartItems"); // Mungkin juga kosongkan keranjang
-        // TODO: arahkan user ke  link payment yang berhasil didapatkan setelah checkout
-        // window.location.href = response.data.link;
+        
+        const cleanUrl = response.data.data.link.replaceAll('\\/', "/");
+        window.location.href = cleanUrl;
       }
 
       // Bersihkan order lokal setelah sukses
@@ -210,21 +206,20 @@ function Checkout() {
                           <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                           <div className="flex justify-between items-center text-sm">
                             <span>Quantity</span>
-                            <span className="font-semibold">{item.quantity || 1}</span>
+                            <span className="font-semibold">{item.total_person || 1}</span>
                           </div>
                           <div className="flex justify-between items-center text-sm">
                             <span>Price per unit</span>
-                            <span className="font-semibold">${item.price?.toFixed(2) || 'N/A'}</span>
+                            <span className="font-semibold">${item.price_per_unit?.toFixed(2) || 'N/A'}</span>
                           </div>
                           <div className="flex justify-between items-center text-sm mt-2">
                             <span>Subtotal</span>
-                            <span className="font-semibold">${(item.price * (item.quantity || 1))?.toFixed(2) || 'N/A'}</span>
+                            <span className="font-semibold">${(item.price_per_unit * (item.total_people || 1))?.toFixed(2) || 0}</span>
                           </div>
                           {/* Display additional details from item if available */}
-                          {item.bookingDates && (
+                          {(item.start_rent_date || item.end_renta_date) && (
                             <div className="text-xs text-white/80 mt-2">
-                                Date: {new Date(item.bookingDates.date || item.bookingDates.start).toLocaleDateString()}
-                                {item.bookingDates.time && ` @ ${item.bookingDates.time}`}
+                                Date: {new Date(item.start_rent_date || item.end_rent_date).toLocaleDateString()}
                             </div>
                           )}
                         </div>
@@ -373,18 +368,6 @@ function Checkout() {
                     <button
                       type="button"
                       className={`p-4 border rounded-xl flex items-center gap-3 transition-all ${
-                        formData.paymentMethod === "credit-card"
-                          ? "border-purple-500 bg-purple-50 text-purple-700"
-                          : "border-gray-200 hover:border-purple-500 hover:bg-purple-50"
-                      }`}
-                      onClick={() => handleInputChange({ target: { name: "paymentMethod", value: "credit-card" } })}
-                    >
-                      <span className="text-2xl">💳</span>
-                      Credit Card
-                    </button>
-                    <button
-                      type="button"
-                      className={`p-4 border rounded-xl flex items-center gap-3 transition-all ${
                         formData.paymentMethod === "paypal"
                           ? "border-purple-500 bg-purple-50 text-purple-700"
                           : "border-gray-200 hover:border-purple-500 hover:bg-purple-50"
@@ -396,52 +379,6 @@ function Checkout() {
                     </button>
                   </div>
                 </div>
-
-                {/* Credit Card Details */}
-                {formData.paymentMethod === "credit-card" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="space-y-6"
-                  >
-                    <h3 className="text-xl font-semibold text-gray-800">Card Details</h3>
-                    <div>
-                      <label className="block font-medium mb-2 text-gray-700">Card Number</label>
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={handleInputChange}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                        placeholder="1234 5678 9012 3456"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block font-medium mb-2 text-gray-700">Expiry Date</label>
-                        <input
-                          type="text"
-                          name="cardExpiry"
-                          value={formData.cardExpiry}
-                          onChange={handleInputChange}
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                          placeholder="MM/YY"
-                        />
-                      </div>
-                      <div>
-                        <label className="block font-medium mb-2 text-gray-700">CVC</label>
-                        <input
-                          type="text"
-                          name="cardCVC"
-                          value={formData.cardCVC}
-                          onChange={handleInputChange}
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                          placeholder="123"
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
 
                 {/* Special Requests */}
                 <div className="space-y-6">

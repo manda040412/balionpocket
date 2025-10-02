@@ -96,12 +96,11 @@ function AirportTransfer() {
     try {
       const response = await addItemToCart(orderData);
 
-      localStorage.setItem("currentOrder", JSON.stringify(response));
       toast({
         title: "Transfer Reserved",
         description: `Your airport transfer to ${destinationData.name} has been added to cart`,
       });
-      navigate("/checkout");
+      navigate("/cart");
     } catch (apiError) {
       console.error("Error submitting airport transfer order:", apiError);
       toast({
@@ -179,7 +178,7 @@ function AirportTransfer() {
                         <div>
                           <h3 className="text-xl font-bold text-teal-800">{destination.name}</h3>
                           <p className="text-lg font-medium">
-                            {destination.distance} {/* Satuan jaraknya mana? */} (${destination.price})
+                            {destination.distance} KM {/* Satuan jaraknya mana? */} (${destination.price})
                           </p>
 
                           {/* Perlu dicek, tambahkan satuan waktu */}
