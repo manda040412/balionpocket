@@ -343,7 +343,7 @@ function Home() {
                   <p className="text-sm text-emerald-600 mb-6">{car.highlight}</p> {/* Perlu dicek */}
                   <Button
                     className="w-full bg-black hover:bg-gray-800"
-                    onClick={() => navigate(`/car/${car.id}`)}
+                    onClick={() => navigate(`/car-rental`)}
                   > {/* Mengarahkan ke halaman car-detail utama */}
                     Rent Now
                   </Button>
@@ -355,7 +355,7 @@ function Home() {
             <Button
               size="lg"
               className="text-lg px-8 py-6 bg-gray-900 hover:bg-gray-800"
-              onClick={() => navigate("/car-detail")}
+              onClick={() => navigate("/car-rental")}
             > {/* Mengarahkan ke halaman car-detail utama */}
               View All Car Rentals
             </Button>

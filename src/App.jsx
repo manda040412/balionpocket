@@ -31,7 +31,7 @@
               <Route path="/" element={<Home />} />
               <Route path="/packages" element={<Packages />} />
               <Route path="/package/:id" element={<PackageDetail />} />
-              <Route path="/car/:id" element={<CarDetail />} />
+              <Route path="/car-rental" element={<CarDetail />} />
               <Route path="/airport-transit" element={<AirportTransit />} />
               <Route path="/api/auth/callback" element={<AuthCallback />} />
               <Route path="/company-profile" element={<CompanyProfile />} /> {/* <-- Moved here to be public */}
