@@ -60,6 +60,9 @@ function Navbar() {
             <Link to="/company-profile" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>
               Company Profile
             </Link>
+            <Link to="/gallery" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>
+              Gallery
+            </Link>
           </nav>
 
           {/* Auth Buttons */}
@@ -117,6 +120,9 @@ function Navbar() {
               Car Rental
             </Link>
             <Link to="/company-profile" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>
+              Company Profile
+            </Link>
+            <Link to="/gallery" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>
               Company Profile
             </Link>
 

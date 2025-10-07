@@ -1,44 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 function CompanyProfile() {
+  const navigate = useNavigate(); // Tambahkan baris ini
   const [isCounting, setIsCounting] = useState(false);
   const countRef = useRef(null);
   const isInView = useInView(countRef, { once: true, margin: "-100px" });
-  
+
   const galleryRef = useRef(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const controls = useAnimation();
-  
+
   const milestones = [
     { value: 2016, label: "Established" },
     { value: 10000, label: "Happy Customers" },
     { value: 250, label: "Tour Packages" },
     { value: 50, label: "Local Partners" }
   ];
-  
+
   const galleryImages = [
-    {
-      url: "https://images.unsplash.com/photo-1558005530-a7958896ec60",
-      caption: "Exploring the sacred Uluwatu Temple"
-    },
-    {
-      url: "https://images.unsplash.com/photo-1577717705920-9db5d985e1ae", 
-      caption: "Unforgettable Tegallalang Rice Terraces"
-    },
-    {
-      url: "https://images.unsplash.com/photo-1604999333679-b86d54738315", 
-      caption: "Beautiful sunset at Tanah Lot"
-    },
-    {
-      url: "https://images.unsplash.com/photo-1537996194471-e657df975ab4", 
-      caption: "Private tours to Nusa Penida"
-    },
-    {
-      url: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2",
-      caption: "VIP airport transfers with our fleet"
-    }
+    { url: "/img/gallery1.jpeg" },
+    { url: "/img/gallery2.jpeg" },
+    { url: "/img/gallery3.jpeg" },
+    { url: "/img/gallery4.jpeg" },
+    { url: "/img/gallery5.jpeg" },
+    { url: "/img/gallery6.jpeg" }
   ];
 
   const containerVariants = {
@@ -50,7 +38,7 @@ function CompanyProfile() {
       }
     }
   };
-  
+
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -61,28 +49,28 @@ function CompanyProfile() {
       }
     }
   };
-  
+
   useEffect(() => {
     if (isInView && !isCounting) {
       setIsCounting(true);
     }
   }, [isInView, isCounting]);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex(prev => (prev + 1) % galleryImages.length);
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, [galleryImages.length]);
-  
+
   useEffect(() => {
     controls.start({
       x: `-${currentImageIndex * 100}%`,
       transition: { ease: "easeInOut", duration: 0.8 }
     });
   }, [currentImageIndex, controls]);
-  
+
   return (
     <div className="bg-white min-h-screen pt-20"> {/* Added padding-top for navbar */}
       {/* About Us Section */}
@@ -108,14 +96,14 @@ function CompanyProfile() {
                 From airport transfers to fully customized tour packages, we pride ourselves on attention to detail, professional service, and creating meaningful connections between our guests and the magical island of Bali.
               </p>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               variants={itemVariants}
               className="relative h-[500px] overflow-hidden rounded-xl shadow-2xl"
             >
-              <img 
-                src="https://images.unsplash.com/photo-1544550285-f813f6545bad" 
-                alt="Bali Corner Tour" 
+              <img
+                src="/img/IMG_20191118_094915.jpg"
+                alt="Bali Corner Tour"
                 className="w-full h-full object-cover"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-8">
@@ -142,9 +130,9 @@ function CompanyProfile() {
               Our Mission & Vision
             </motion.h2>
             <motion.div variants={itemVariants} className="w-20 h-2 bg-emerald-500 mx-auto mb-12"></motion.div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <motion.div 
+              <motion.div
                 variants={itemVariants}
                 className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
@@ -158,8 +146,8 @@ function CompanyProfile() {
                   To provide exceptional travel experiences that showcase the authentic beauty of Bali while supporting local communities and preserving our cultural heritage. We strive to make every journey memorable through personalized service, attention to detail, and genuine Balinese hospitality.
                 </p>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 variants={itemVariants}
                 className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
               >
@@ -180,7 +168,7 @@ function CompanyProfile() {
       </section>
 
       {/* Milestones Counter Section */}
-      <section 
+      <section
         ref={countRef}
         className="py-24 bg-emerald-800 text-white"
       >
@@ -196,11 +184,11 @@ function CompanyProfile() {
               Our Journey
             </motion.h2>
             <motion.p variants={itemVariants} className="text-xl max-w-2xl mx-auto">
-              From our humble beginnings to becoming one of Bali's premier tour operators, 
+              From our humble beginnings to becoming one of Bali's premier tour operators,
               our journey has been filled with unforgettable moments and happy clients.
             </motion.p>
           </motion.div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {milestones.map((item, index) => (
               <motion.div
@@ -210,10 +198,10 @@ function CompanyProfile() {
                 transition={{ delay: index * 0.2 }}
                 className="text-center"
               >
-                <CountUp 
-                  end={item.value} 
-                  isCounting={isCounting} 
-                  className="text-5xl md:text-6xl font-bold mb-2" 
+                <CountUp
+                  end={item.value}
+                  isCounting={isCounting}
+                  className="text-5xl md:text-6xl font-bold mb-2"
                 />
                 <p className="text-xl text-emerald-200">{item.label}</p>
               </motion.div>
@@ -225,6 +213,7 @@ function CompanyProfile() {
       {/* Improved Gallery Section */}
       <section className="py-24 bg-gray-100">
         <div className="container mx-auto px-4">
+          {/* Title */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -232,42 +221,54 @@ function CompanyProfile() {
             variants={containerVariants}
             className="text-center mb-16"
           >
-            <motion.h2 variants={itemVariants} className="text-4xl md:text-5xl font-bold mb-6">
+            <motion.h2
+              variants={itemVariants}
+              className="text-4xl md:text-5xl font-bold mb-6"
+            >
               Explore Bali With Us
             </motion.h2>
-            <motion.p variants={itemVariants} className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <motion.p
+              variants={itemVariants}
+              className="text-xl text-gray-600 max-w-2xl mx-auto mb-8"
+            >
               Discover the beauty of Bali through our curated experiences
             </motion.p>
           </motion.div>
-          
-          <div className="relative group">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleryImages.map((image, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <div className="aspect-w-16 aspect-h-9">
-                    <img 
-                      src={image.url} 
-                      alt={image.caption}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                    <p className="text-white text-lg font-medium">{image.caption}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+
+          {/* Gallery */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {galleryImages.map((image, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <div className="aspect-w-16 aspect-h-9">
+                  <img
+                    src={image.url}
+                    alt=""
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Button See More */}
+          <div className="text-center mt-12">
+            <Button
+              onClick={() => navigate("/gallery")}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-lg px-8 py-3 rounded-xl shadow-md"
+            >
+              See More
+            </Button>
           </div>
         </div>
       </section>
 
-       {/* Services Section */}
+      {/* Services Section */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <motion.div
@@ -284,7 +285,7 @@ function CompanyProfile() {
               Comprehensive travel solutions for your perfect Bali experience
             </motion.p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -322,7 +323,7 @@ function CompanyProfile() {
                 </li>
               </ul>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -359,7 +360,7 @@ function CompanyProfile() {
                 </li>
               </ul>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -417,7 +418,7 @@ function CompanyProfile() {
               Hear from travelers who have experienced Bali with us
             </motion.p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -445,11 +446,11 @@ function CompanyProfile() {
               >
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <svg 
+                    <svg
                       key={i}
-                      xmlns="http://www.w3.org/2000/svg" 
-                      className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`} 
-                      viewBox="0 0 20 20" 
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                      viewBox="0 0 20 20"
                       fill="currentColor"
                     >
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -485,7 +486,7 @@ function CompanyProfile() {
                 Book Now
               </Button>
               <Button
-                size="lg" 
+                size="lg"
                 className="text-lg px-8 py-6 bg-white text-emerald-700 hover:bg-gray-100"
               >
                 Contact Us
@@ -500,13 +501,13 @@ function CompanyProfile() {
 
 function CountUp({ end, isCounting, className }) {
   const [count, setCount] = useState(0);
-  
+
   useEffect(() => {
     if (!isCounting) return;
-    
+
     const duration = 2000;
     const increment = end / (duration / 16);
-    
+
     let currentCount = 0;
     const timer = setInterval(() => {
       currentCount += increment;
@@ -517,10 +518,10 @@ function CountUp({ end, isCounting, className }) {
         setCount(Math.floor(currentCount));
       }
     }, 16);
-    
+
     return () => clearInterval(timer);
   }, [end, isCounting]);
-  
+
   return <span className={className}>{count.toLocaleString()}</span>;
 }
 
