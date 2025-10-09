@@ -61,7 +61,7 @@ function Navbar() {
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className={`font-medium ${!isScrolled && isHomePage
+              className={`font-medium px-4 ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -222,7 +222,7 @@ function Navbar() {
           <nav className="flex flex-col space-y-4">
             <Link
               to="/"
-              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+              className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -231,7 +231,7 @@ function Navbar() {
             </Link>
             <Link
               to="/packages"
-              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+              className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -240,7 +240,7 @@ function Navbar() {
             </Link>
             <Link
               to="/airport-transit"
-              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+              className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -249,7 +249,7 @@ function Navbar() {
             </Link>
             <Link
               to="/car/1"
-              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+              className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -258,7 +258,7 @@ function Navbar() {
             </Link>
             <Link
               to="/company-profile"
-              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+              className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -267,7 +267,7 @@ function Navbar() {
             </Link>
             <Link
               to="/gallery"
-              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+              className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -275,10 +275,10 @@ function Navbar() {
               Gallery
             </Link>
 
-            <div className="pt-4 border-t border-gray-200">
+            <div className=" border-t border-gray-200">
               <Link
                 to="/cart"
-                className={`flex items-center space-x-2 font-medium mb-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
+                className={`flex items-center space-x-2 font-medium mb-4 px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                   ? "text-white hover:text-white/80"
                   : "text-gray-700 hover:text-blue-600"
                   }`}
@@ -290,7 +290,7 @@ function Navbar() {
               {isLogin() ? (
                 <div className="flex flex-col space-y-4">
                   <div
-                    className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+                    className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                       ? "text-white"
                       : "text-gray-900"
                       }`}
@@ -299,7 +299,7 @@ function Navbar() {
                   </div>
                   <Link
                     to="/profile"
-                    className={`flex items-center space-x-2 font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
+                    className={`flex items-center space-x-2 font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                       ? "text-white hover:text-white/80"
                       : "text-gray-700 hover:text-blue-600"
                       }`}
