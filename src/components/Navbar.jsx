@@ -85,13 +85,7 @@ function Navbar() {
             >
               Airport Transit
             </Link>
-            <Link
-              to="/car/1"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
-                ? "text-white hover:text-white/80"
-                : "text-gray-700 hover:text-blue-600"
-                }`}
-            >
+            <Link to="/car-rental" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>
               Car Rental
             </Link>
             <Link

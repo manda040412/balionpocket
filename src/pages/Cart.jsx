@@ -289,7 +289,7 @@ function Cart() {
                           <img
                             alt={item.title}
                             className="w-full h-full object-cover"
-                            src={item.detail.media_url || "/api/placeholder/400/300"}
+                            src={item.detail?.media_url || "/api/placeholder/400/300"}
                           />
                           <div className="absolute bottom-0 left-0 bg-blue-600 text-white px-3 py-1 text-sm font-medium">
                             {item.type}
