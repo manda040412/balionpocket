@@ -35,9 +35,12 @@ function Navbar() {
   const buttonClass =
     "bg-white text-gray-900 border border-white hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-colors duration-300";
 
+  // Check if we're on homepage for mobile menu styling
+  const isHomePage = location.pathname === "/";
+
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${!isScrolled && location.pathname === "/"
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${!isScrolled && isHomePage
         ? "bg-transparent py-4"
         : "bg-white shadow-md py-2"
         }`}
@@ -47,9 +50,7 @@ function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <span
-              className={`font-bold text-2xl ${!isScrolled && location.pathname === "/"
-                ? "text-white"
-                : "text-gray-900"
+              className={`font-bold text-2xl ${!isScrolled && isHomePage ? "text-white" : "text-gray-900"
                 }`}
             >
               Bali On Pocket
@@ -60,7 +61,7 @@ function Navbar() {
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -69,7 +70,7 @@ function Navbar() {
             </Link>
             <Link
               to="/packages"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -78,19 +79,25 @@ function Navbar() {
             </Link>
             <Link
               to="/airport-transit"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
             >
               Airport Transit
             </Link>
-            <Link to="/car-rental" className={`font-medium ${!isScrolled && location.pathname === "/" ? "text-white hover:text-white/80" : "text-gray-700 hover:text-blue-600"}`}>
+            <Link
+              to="/car/1"
+              className={`font-medium ${!isScrolled && isHomePage
+                ? "text-white hover:text-white/80"
+                : "text-gray-700 hover:text-blue-600"
+                }`}
+            >
               Car Rental
             </Link>
             <Link
               to="/company-profile"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -99,7 +106,7 @@ function Navbar() {
             </Link>
             <Link
               to="/gallery"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -113,7 +120,7 @@ function Navbar() {
             {/* Shopping Cart */}
             <Link
               to="/cart"
-              className={`p-2 rounded-full hover:bg-gray-100 ${!isScrolled && location.pathname === "/"
+              className={`p-2 rounded-full hover:bg-gray-100 ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80 hover:bg-white/10"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -124,16 +131,14 @@ function Navbar() {
             {isLogin() ? (
               <div className="flex items-center space-x-4">
                 <div
-                  className={`font-medium ${!isScrolled && location.pathname === "/"
-                    ? "text-white"
-                    : "text-gray-900"
+                  className={`font-medium ${!isScrolled && isHomePage ? "text-white" : "text-gray-900"
                     }`}
                 >
                   Hello, {userName}
                 </div>
                 <Link
                   to="/profile"
-                  className={`p-2 rounded-full hover:bg-gray-100 ${!isScrolled && location.pathname === "/"
+                  className={`p-2 rounded-full hover:bg-gray-100 ${!isScrolled && isHomePage
                     ? "text-white hover:text-white/80 hover:bg-white/10"
                     : "text-gray-700 hover:text-blue-600"
                     }`}
@@ -162,9 +167,7 @@ function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className={`md:hidden p-2 rounded-md ${!isScrolled && location.pathname === "/"
-              ? "text-white"
-              : "text-gray-900"
+            className={`md:hidden p-2 rounded-md ${!isScrolled && isHomePage ? "text-white" : "text-gray-900"
               } focus:outline-none focus:ring-2 focus:ring-blue-500`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
@@ -209,12 +212,17 @@ function Navbar() {
         {/* Mobile Menu */}
         <div
           className={`md:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? "max-h-screen py-4" : "max-h-0"
+            } ${
+            // Tambahkan background untuk mobile menu di homepage
+            isMobileMenuOpen && isHomePage && !isScrolled
+              ? "bg-white/95 backdrop-blur-sm rounded-lg mt-2 shadow-lg"
+              : ""
             }`}
         >
           <nav className="flex flex-col space-y-4">
             <Link
               to="/"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -223,7 +231,7 @@ function Navbar() {
             </Link>
             <Link
               to="/packages"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -232,7 +240,7 @@ function Navbar() {
             </Link>
             <Link
               to="/airport-transit"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -241,7 +249,7 @@ function Navbar() {
             </Link>
             <Link
               to="/car/1"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -250,7 +258,7 @@ function Navbar() {
             </Link>
             <Link
               to="/company-profile"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -259,7 +267,7 @@ function Navbar() {
             </Link>
             <Link
               to="/gallery"
-              className={`font-medium ${!isScrolled && location.pathname === "/"
+              className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
                 }`}
@@ -270,7 +278,7 @@ function Navbar() {
             <div className="pt-4 border-t border-gray-200">
               <Link
                 to="/cart"
-                className={`flex items-center space-x-2 font-medium mb-4 ${!isScrolled && location.pathname === "/"
+                className={`flex items-center space-x-2 font-medium mb-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                   ? "text-white hover:text-white/80"
                   : "text-gray-700 hover:text-blue-600"
                   }`}
@@ -282,7 +290,7 @@ function Navbar() {
               {isLogin() ? (
                 <div className="flex flex-col space-y-4">
                   <div
-                    className={`font-medium ${!isScrolled && location.pathname === "/"
+                    className={`font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                       ? "text-white"
                       : "text-gray-900"
                       }`}
@@ -291,7 +299,7 @@ function Navbar() {
                   </div>
                   <Link
                     to="/profile"
-                    className={`flex items-center space-x-2 font-medium ${!isScrolled && location.pathname === "/"
+                    className={`flex items-center space-x-2 font-medium ${!isScrolled && isHomePage && !isMobileMenuOpen
                       ? "text-white hover:text-white/80"
                       : "text-gray-700 hover:text-blue-600"
                       }`}
