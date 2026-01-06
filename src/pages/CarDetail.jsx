@@ -20,6 +20,8 @@ function CarDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -68,7 +70,7 @@ function CarDetail() {
     return carData.price_per_day * days;
   };
 
-  const handleRent = async () => {
+  const handleRent = async (e) => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
@@ -77,6 +79,9 @@ function CarDetail() {
       });
       localStorage.setItem("redirectAfterLogin", "/car-detail");
       navigate("/login");
+      
+      setIsFailed(true);
+      setMessage("Please login to rent a car")
       return;
     }
 
@@ -86,6 +91,9 @@ function CarDetail() {
         description: "Choose your rental period",
         variant: "destructive",
       });
+      
+      setIsFailed(true);
+      setMessage("Choose your rental period")
       return;
     }
 
@@ -100,6 +108,9 @@ function CarDetail() {
         description: "Please select valid future dates for your rental.",
         variant: "destructive",
       });
+      
+      setIsFailed(true);
+      setMessage("Please select valid future dates for your rental.")
       return;
     }
 
@@ -109,8 +120,14 @@ function CarDetail() {
         description: "No car selected or car data not found.",
         variant: "destructive",
       });
+      
+      setIsFailed(true);
+      setMessage("No car selected or car data not found.")
       return;
     }
+    
+    e.target.disabled = true;
+    e.target.textContent = "Adding to cart...";
 
     const orderData = {
       item_id: carData.id,
@@ -132,12 +149,13 @@ function CarDetail() {
       navigate("/cart");
     } catch (apiError) {
       console.error("Error submitting car rental order:", apiError);
-      toast({
-        title: "Order Failed",
-        description: apiError.response?.data?.message || "Failed to reserve the car. Please try again.",
-        variant: "destructive",
-      });
+      
+      setIsFailed(true);
+      setMessage(apiError.response?.data?.message || "Failed to reserve the car. Please try again.")
     }
+    
+    e.target.disabled = false;
+    e.target.textContent = "Add to cart";
   };
 
   if (isLoading) {
@@ -274,6 +292,7 @@ function CarDetail() {
                 </div>
 
                 <div className="border-t pt-6">
+                  { isFailed && (<p className="text-red-500">{ message }</p> ) }
                   <div className="flex justify-between mb-4 text-lg">
                     <span className="text-gray-700">Total</span>
                     <span className="font-bold text-teal-800">${calculateTotal()}</span>

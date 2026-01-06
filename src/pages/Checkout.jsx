@@ -203,10 +203,10 @@ function Checkout() {
                     {order.items && Array.isArray(order.items) ? (
                       order.items.map((item, index) => (
                         <div key={item.id || index} className="mb-4 pb-2 border-b border-white/20 last:border-b-0">
-                          <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                          <h3 className="text-xl font-bold mb-2">{item?.detail?.name}</h3>
                           <div className="flex justify-between items-center text-sm">
                             <span>Quantity</span>
-                            <span className="font-semibold">{item.total_person || 1}</span>
+                            <span className="font-semibold">{item.total_people || 1}</span>
                           </div>
                           <div className="flex justify-between items-center text-sm">
                             <span>Price per unit</span>

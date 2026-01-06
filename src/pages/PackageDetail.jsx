@@ -18,6 +18,8 @@ function PackageDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
+  const [message, setMessage] = useState("");
 
   const safe = html => ({ __html: DOMPurify.sanitize(html) });
 
@@ -61,7 +63,7 @@ function PackageDetail() {
     }
   }, [id]);
 
-  const handleOrder = async () => {
+  const handleOrder = async (e) => {
     if (!isLoggedIn) {
       toast({
         title: "Login Required",
@@ -79,6 +81,9 @@ function PackageDetail() {
         description: "Choose your preferred date for the journey",
         variant: "destructive",
       });
+      
+      setIsFailed(true);
+      setMessage("Choose your preferred date for the journey")
       return;
     }
 
@@ -91,6 +96,9 @@ function PackageDetail() {
         description: "Please select a future date for your journey",
         variant: "destructive",
       });
+      
+      setIsFailed(true);
+      setMessage("Please select a future date for your journey")
       return;
     }
 
@@ -100,10 +108,16 @@ function PackageDetail() {
         description: "This package requires at least 2 guests",
         variant: "destructive",
       });
+      
+      setIsFailed(true);
+      setMessage("This package requires at least 2 guests")
       return;
     }
 
     if (!packageData) return;
+    
+    e.target.disabled = true;
+    e.target.textContent = "Adding to cart...";
 
     try {
       // --- START PERUBAHAN DI SINI ---
@@ -130,12 +144,13 @@ function PackageDetail() {
       navigate("/cart");
     } catch (apiError) {
       console.error("Error adding package to cart:", apiError);
-      toast({
-        title: "Failed to Add to Cart",
-        description: apiError.response?.data?.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
+      
+      setIsFailed(true);
+      setMessage(apiError.response?.data?.message || "Something went wrong. Please try again.")
     }
+    
+    e.target.disabled = false;
+    e.target.textContent = "Add to cart";
   };
 
   if (isLoading) {
@@ -244,9 +259,10 @@ function PackageDetail() {
                 </div>
 
                 <div className="border-t pt-6">
+                  { isFailed && (<p className="text-red-500">{ message }</p> ) }
                   <div className="flex justify-between mb-4">
                     <span>Total</span>
-                    <span className="font-bold text-xl">${packageData.price_per_pax * quantity} USD</span>
+                    <span className="font-bold text-xl">${packageData.price_per_pax * quantity}</span>
                   </div>
 
                   <Button

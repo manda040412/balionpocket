@@ -491,56 +491,6 @@ function Cart() {
         )}
       </div>
 
-      {/* You might also like section - If this data is also dynamic, fetch from API */}
-      {!isLoading && cartItems.length > 0 && (
-        <section className="bg-gray-100 py-16 mt-8">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-8 text-center">You Might Also Like</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { id: "rec1", title: "VIP Airport Fast Track", price: 45, description: "Expedited immigration and customs clearance", image: "https://images.unsplash.com/photo-1556388158-158ea5ccacbd" },
-                { id: "rec2", title: "Luggage Storage Service", price: 15, description: "Secure storage for your luggage during transit", image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12" },
-                { id: "rec3", title: "Private City Tour", price: 90, description: "Explore the city during your long layover", image: "https://images.unsplash.com/photo-1533107862482-0e6974b06ec4" }
-              ].map((recommendation, index) => (
-                <motion.div
-                  key={recommendation.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                  onClick={() => navigate(`/package/${recommendation.id}`)}
-                >
-                  <div className="h-48 overflow-hidden relative">
-                    <img
-                      alt={recommendation.title}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                      src={recommendation.image}
-                    />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-4 py-1">
-                      <span className="font-bold">${recommendation.price}</span>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg mb-2">{recommendation.title}</h3>
-                    <p className="text-gray-600 mb-4">{recommendation.description}</p>
-                    <Button
-                      variant="outline"
-                      className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/package/${recommendation.id}`);
-                      }}
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

@@ -87,7 +87,7 @@ function Navbar() {
               Airport Transit
             </Link>
             <Link
-              to="/car/1"
+              to="/car-rental"
               className={`font-medium ${!isScrolled && isHomePage
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"
@@ -248,7 +248,7 @@ function Navbar() {
               Airport Transit
             </Link>
             <Link
-              to="/car/1"
+              to="/car-rental"
               className={`font-medium px-4 ${!isScrolled && isHomePage && !isMobileMenuOpen
                 ? "text-white hover:text-white/80"
                 : "text-gray-700 hover:text-blue-600"

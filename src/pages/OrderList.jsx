@@ -201,7 +201,7 @@ function OrderList() {
           {/* Profile Content */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Left Sidebar - Actions */}
-            <div className="md:col-span-1">
+            <div className="md:col-span-1 space-y-4">
               <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
                 <div className="p-6">
                   <h2 className="text-xl font-bold mb-4">Account</h2>
@@ -238,6 +238,20 @@ function OrderList() {
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div className="p-3 space-y-2">
+                  <h4 className="font-bold text-xl">Rules</h4>
+                  
+                  <div className="py-1">
+                    <ol className="list-decimal ml-5 space-y-2">
+                      <li>Order cannot be cancelled</li>
+                      <li>If you cannot join the tour, please inform the admin</li>
+                      <li>Contact him by following link: <a href="https://wa.me/6281212212" className="bg-primary py-1 px-2 text-white rounded-lg">Click here</a> </li>
+                    </ol>
                   </div>
                 </div>
               </div>

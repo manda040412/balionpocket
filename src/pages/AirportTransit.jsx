@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Calendar, Clock, Users, Plane, MapPin } from "lucide-react";
 
 // Import API function
-import { fetchAirportTransitDestinations, createAirportTransferOrder } from '../services/airportTransitApi';
+import { fetchAirportTransitDestinations } from '../services/airportTransitApi';
 import { addItemToCart } from "../services/cartApi";
 
 function AirportTransfer() {
@@ -17,6 +17,8 @@ function AirportTransfer() {
   const [destinationData, setDestinationData] = useState({})
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFailed, setIsFailed] = useState(false);
+  const [message, setMessage] = useState("");
 
   const [formData, setFormData] = useState({
     date: "",
@@ -36,11 +38,6 @@ function AirportTransfer() {
       } catch (err) {
         setError("Failed to load destinations. Please try again later.");
         console.error(err);
-        toast({
-          title: "Error",
-          description: "Failed to load airport transit destinations.",
-          variant: "destructive",
-        });
       } finally {
         setLoading(false);
       }
@@ -70,15 +67,15 @@ function AirportTransfer() {
     return basePrice * formData.passengers;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {    
     if (!formData.date || !formData.time || !formData.dropoffAddress) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+      setIsFailed(true);
+      setMessage("Please fill in all required fields")
       return;
     }
+    
+    e.target.disabled = true;
+    e.target.textContent = "Adding to cart...";
 
     const orderData = {
       item_id: selectedDestination,
@@ -103,12 +100,13 @@ function AirportTransfer() {
       navigate("/cart");
     } catch (apiError) {
       console.error("Error submitting airport transfer order:", apiError);
-      toast({
-        title: "Order Failed",
-        description: apiError.response?.data?.message || "Failed to submit your transfer order. Please try again.",
-        variant: "destructive",
-      });
+      
+      setIsFailed(true);
+      setMessage(apiError.response?.data?.message || "Failed to submit your transfer order. Please try again.")
     }
+    
+    e.target.disabled = false;
+    e.target.textContent = "Add to cart";
   };
 
   if (loading) {
@@ -281,6 +279,7 @@ function AirportTransfer() {
                 </div>
 
                 <div className="border-t pt-6">
+                  { isFailed && (<p className="text-red-500">{ message }</p> ) }
                   <div className="flex justify-between mb-4 text-lg">
                     <span className="text-gray-700">Total</span>
                     <span className="font-bold text-teal-800">${calculateTotal()}</span>
